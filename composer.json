@@ -1,0 +1,46 @@
+{
+    "name": "trust-medical/diff-view",
+    "version": "1.0.0",
+    "description": "A Filament plugin for viewing diffs.",
+    "keywords": [
+        "laravel",
+        "filament",
+        "diff-view"
+    ],
+    "homepage": "https://github.com/trust-medical/diff-view",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "trust-medical",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.3",
+        "filament/filament": "^4.0|^5.0",
+        "spatie/laravel-package-tools": "^1.15",
+        "sebastian/diff": "^6.0|^7.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^9.0|^10.0",
+        "laravel/pint": "^1.0",
+        "larastan/larastan": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "TrustMedical\\DiffView\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "TrustMedical\\DiffView\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "TrustMedical\\DiffView\\DiffViewServiceProvider"
+            ]
+        }
+    }
+}

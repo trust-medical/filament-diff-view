@@ -1,0 +1,11 @@
+* text=auto
+*.php diff=php
+*.md text
+*.js text
+*.css text
+*.json text
+*.yml text
+LICENSE.md linguist-documentation
+CHANGELOG.md linguist-documentation
+CONTRIBUTING.md linguist-documentation
+SECURITY.md linguist-documentation

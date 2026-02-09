@@ -1,0 +1,14 @@
+/vendor/
+/node_modules/
+composer.lock
+npm-debug.log
+yarn-error.log
+.env
+.DS_Store
+.idea/
+.vscode/
+docker-compose.override.yml
+.phpunit.result.cache
+/dist/
+*.swp
+*.swo
