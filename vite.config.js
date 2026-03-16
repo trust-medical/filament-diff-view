@@ -16,8 +16,13 @@ export default defineConfig({
         rollupOptions: {
             output: {
                 assetFileNames: (assetInfo) => {
-                    if (assetInfo.name === 'style.css') return 'index.css';
-                    return assetInfo.name;
+                    const assetName = assetInfo.names?.[0];
+
+                    if (assetName === 'style.css') {
+                        return 'index.css';
+                    }
+
+                    return assetName ?? 'assets/[name]-[hash][extname]';
                 },
             },
         },

@@ -1,1548 +1,1529 @@
-var H;
-(function(i) {
-  i.INSERT = "insert", i.DELETE = "delete", i.CONTEXT = "context";
-})(H || (H = {}));
-const Ke = {
-  LINE_BY_LINE: "line-by-line"
-}, et = {
-  NONE: "none"
-}, tt = {
-  WORD: "word"
-};
-var ee;
-(function(i) {
-  i.AUTO = "auto", i.DARK = "dark", i.LIGHT = "light";
-})(ee || (ee = {}));
-const nt = [
-  "-",
-  "[",
-  "]",
-  "/",
-  "{",
-  "}",
-  "(",
-  ")",
-  "*",
-  "+",
-  "?",
-  ".",
-  "\\",
-  "^",
-  "$",
-  "|"
-], it = RegExp("[" + nt.join("\\") + "]", "g");
-function rt(i) {
-  return i.replace(it, "\\$&");
+//#region \0rolldown/runtime.js
+var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescriptor, r = Object.getOwnPropertyNames, i = Object.getPrototypeOf, a = Object.prototype.hasOwnProperty, o = (e, t) => () => (t || e((t = { exports: {} }).exports, t), t.exports), s = (e, n) => {
+	let r = {};
+	for (var i in e) t(r, i, {
+		get: e[i],
+		enumerable: !0
+	});
+	return n || t(r, Symbol.toStringTag, { value: "Module" }), r;
+}, c = (e, i, o, s) => {
+	if (i && typeof i == "object" || typeof i == "function") for (var c = r(i), l = 0, u = c.length, d; l < u; l++) d = c[l], !a.call(e, d) && d !== o && t(e, d, {
+		get: ((e) => i[e]).bind(null, d),
+		enumerable: !(s = n(i, d)) || s.enumerable
+	});
+	return e;
+}, l = (n, r, a) => (a = n == null ? {} : e(i(n)), c(r || !n || !n.__esModule ? t(a, "default", {
+	value: n,
+	enumerable: !0
+}) : a, n)), u;
+(function(e) {
+	e.INSERT = "insert", e.DELETE = "delete", e.CONTEXT = "context";
+})(u ||= {});
+var d = {
+	LINE_BY_LINE: "line-by-line",
+	SIDE_BY_SIDE: "side-by-side"
+}, f = {
+	LINES: "lines",
+	WORDS: "words",
+	NONE: "none"
+}, p = {
+	WORD: "word",
+	CHAR: "char"
+}, m;
+(function(e) {
+	e.AUTO = "auto", e.DARK = "dark", e.LIGHT = "light";
+})(m ||= {});
+//#endregion
+//#region node_modules/diff2html/lib-esm/utils.js
+var h = RegExp("[" + [
+	"-",
+	"[",
+	"]",
+	"/",
+	"{",
+	"}",
+	"(",
+	")",
+	"*",
+	"+",
+	"?",
+	".",
+	"\\",
+	"^",
+	"$",
+	"|"
+].join("\\") + "]", "g");
+function g(e) {
+	return e.replace(h, "\\$&");
 }
-function He(i) {
-  return i && i.replace(/\\/g, "/");
+function _(e) {
+	return e && e.replace(/\\/g, "/");
 }
-function st(i) {
-  let t, n, e, r = 0;
-  for (t = 0, e = i.length; t < e; t++)
-    n = i.charCodeAt(t), r = (r << 5) - r + n, r |= 0;
-  return r;
+function v(e) {
+	let t, n, r, i = 0;
+	for (t = 0, r = e.length; t < r; t++) n = e.charCodeAt(t), i = (i << 5) - i + n, i |= 0;
+	return i;
 }
-function Ve(i) {
-  const t = i.length;
-  let n = -1 / 0;
-  for (let e = 0; e < t; e++)
-    n = Math.max(n, i[e]);
-  return n;
+function y(e) {
+	let t = e.length, n = -Infinity;
+	for (let r = 0; r < t; r++) n = Math.max(n, e[r]);
+	return n;
 }
-function Fe(i, t) {
-  const n = i.split(".");
-  return n.length > 1 ? n[n.length - 1] : t;
+//#endregion
+//#region node_modules/diff2html/lib-esm/diff-parser.js
+function b(e, t) {
+	let n = e.split(".");
+	return n.length > 1 ? n[n.length - 1] : t;
 }
-function Ae(i, t) {
-  return t.reduce((n, e) => n || i.startsWith(e), !1);
+function x(e, t) {
+	return t.reduce((t, n) => t || e.startsWith(n), !1);
 }
-const Be = ["a/", "b/", "i/", "w/", "c/", "o/"];
-function J(i, t, n) {
-  const e = n !== void 0 ? [...Be, n] : Be, r = t ? new RegExp(`^${rt(t)} "?(.+?)"?$`) : new RegExp('^"?(.+?)"?$'), [, s = ""] = r.exec(i) || [], a = e.find((c) => s.indexOf(c) === 0);
-  return (a ? s.slice(a.length) : s).replace(/\s+\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:\.\d+)? [+-]\d{4}.*$/, "");
+var S = [
+	"a/",
+	"b/",
+	"i/",
+	"w/",
+	"c/",
+	"o/"
+];
+function C(e, t, n) {
+	let r = n === void 0 ? S : [...S, n], [, i = ""] = (t ? RegExp(`^${g(t)} "?(.+?)"?$`) : /* @__PURE__ */ RegExp("^\"?(.+?)\"?$")).exec(e) || [], a = r.find((e) => i.indexOf(e) === 0);
+	return (a ? i.slice(a.length) : i).replace(/\s+\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:\.\d+)? [+-]\d{4}.*$/, "");
 }
-function at(i, t) {
-  return J(i, "---", t);
+function ee(e, t) {
+	return C(e, "---", t);
 }
-function lt(i, t) {
-  return J(i, "+++", t);
+function te(e, t) {
+	return C(e, "+++", t);
 }
-function qe(i, t = {}) {
-  const n = [];
-  let e = null, r = null, s = null, a = null, u = null, c = null, h = null;
-  const g = "--- ", y = "+++ ", L = "@@", o = /^old mode (\d{6})/, f = /^new mode (\d{6})/, v = /^deleted file mode (\d{6})/, p = /^new file mode (\d{6})/, T = /^copy from "?(.+)"?/, D = /^copy to "?(.+)"?/, N = /^rename from "?(.+)"?/, x = /^rename to "?(.+)"?/, E = /^similarity index (\d+)%/, O = /^dissimilarity index (\d+)%/, j = /^index ([\da-z]+)\.\.([\da-z]+)\s*(\d{6})?/, l = /^Binary files (.*) and (.*) differ/, d = /^GIT binary patch/, b = /^index ([\da-z]+),([\da-z]+)\.\.([\da-z]+)/, C = /^mode (\d{6}),(\d{6})\.\.(\d{6})/, A = /^new file mode (\d{6})/, z = /^deleted file mode (\d{6}),(\d{6})/, P = i.replace(/\\ No newline at end of file/g, "").replace(/\r\n?/g, `
-`).split(`
-`);
-  function I() {
-    r !== null && e !== null && (e.blocks.push(r), r = null);
-  }
-  function X() {
-    e !== null && (!e.oldName && c !== null && (e.oldName = c), !e.newName && h !== null && (e.newName = h), e.newName && (n.push(e), e = null)), c = null, h = null;
-  }
-  function Y() {
-    I(), X(), e = {
-      blocks: [],
-      deletedLines: 0,
-      addedLines: 0
-    };
-  }
-  function k(m) {
-    I();
-    let S;
-    e !== null && ((S = /^@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@.*/.exec(m)) ? (e.isCombined = !1, s = parseInt(S[1], 10), u = parseInt(S[2], 10)) : (S = /^@@@ -(\d+)(?:,\d+)? -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@@.*/.exec(m)) ? (e.isCombined = !0, s = parseInt(S[1], 10), a = parseInt(S[2], 10), u = parseInt(S[3], 10)) : (m.startsWith(L) && console.error("Failed to parse lines, starting in 0!"), s = 0, u = 0, e.isCombined = !1)), r = {
-      lines: [],
-      oldStartLine: s,
-      oldStartLine2: a,
-      newStartLine: u,
-      header: m
-    };
-  }
-  function B(m) {
-    if (e === null || r === null || s === null || u === null)
-      return;
-    const S = {
-      content: m
-    }, w = e.isCombined ? ["+ ", " +", "++"] : ["+"], $ = e.isCombined ? ["- ", " -", "--"] : ["-"];
-    Ae(m, w) ? (e.addedLines++, S.type = H.INSERT, S.oldNumber = void 0, S.newNumber = u++) : Ae(m, $) ? (e.deletedLines++, S.type = H.DELETE, S.oldNumber = s++, S.newNumber = void 0) : (S.type = H.CONTEXT, S.oldNumber = s++, S.newNumber = u++), r.lines.push(S);
-  }
-  function Q(m, S) {
-    let w = S;
-    for (; w < P.length - 3; ) {
-      if (m.startsWith("diff"))
-        return !1;
-      if (P[w].startsWith(g) && P[w + 1].startsWith(y) && P[w + 2].startsWith(L))
-        return !0;
-      w++;
-    }
-    return !1;
-  }
-  return P.forEach((m, S) => {
-    if (!m || m.startsWith("*"))
-      return;
-    let w;
-    const $ = P[S - 1], ne = P[S + 1], pe = P[S + 2];
-    if (m.startsWith("diff --git") || m.startsWith("diff --combined")) {
-      if (Y(), (w = /^diff --git "?([a-ciow]\/.+)"? "?([a-ciow]\/.+)"?/.exec(m)) && (c = J(w[1], void 0, t.dstPrefix), h = J(w[2], void 0, t.srcPrefix)), e === null)
-        throw new Error("Where is my file !!!");
-      e.isGitDiff = !0;
-      return;
-    }
-    if (m.startsWith("Binary files") && !e?.isGitDiff) {
-      if (Y(), (w = /^Binary files "?([a-ciow]\/.+)"? and "?([a-ciow]\/.+)"? differ/.exec(m)) && (c = J(w[1], void 0, t.dstPrefix), h = J(w[2], void 0, t.srcPrefix)), e === null)
-        throw new Error("Where is my file !!!");
-      e.isBinary = !0;
-      return;
-    }
-    if ((!e || !e.isGitDiff && e && m.startsWith(g) && ne.startsWith(y) && pe.startsWith(L)) && Y(), e?.isTooBig)
-      return;
-    if (e && (typeof t.diffMaxChanges == "number" && e.addedLines + e.deletedLines > t.diffMaxChanges || typeof t.diffMaxLineLength == "number" && m.length > t.diffMaxLineLength)) {
-      e.isTooBig = !0, e.addedLines = 0, e.deletedLines = 0, e.blocks = [], r = null;
-      const ie = typeof t.diffTooBigMessage == "function" ? t.diffTooBigMessage(n.length) : "Diff too big to be displayed";
-      k(ie);
-      return;
-    }
-    if (m.startsWith(g) && ne.startsWith(y) || m.startsWith(y) && $.startsWith(g)) {
-      if (e && !e.oldName && m.startsWith("--- ") && (w = at(m, t.srcPrefix))) {
-        e.oldName = w, e.language = Fe(e.oldName, e.language);
-        return;
-      }
-      if (e && !e.newName && m.startsWith("+++ ") && (w = lt(m, t.dstPrefix))) {
-        e.newName = w, e.language = Fe(e.newName, e.language);
-        return;
-      }
-    }
-    if (e && (m.startsWith(L) || e.isGitDiff && e.oldName && e.newName && !r)) {
-      k(m);
-      return;
-    }
-    if (r && (m.startsWith("+") || m.startsWith("-") || m.startsWith(" "))) {
-      B(m);
-      return;
-    }
-    const Z = !Q(m, S);
-    if (e === null)
-      throw new Error("Where is my file !!!");
-    (w = o.exec(m)) ? e.oldMode = w[1] : (w = f.exec(m)) ? e.newMode = w[1] : (w = v.exec(m)) ? (e.deletedFileMode = w[1], e.isDeleted = !0) : (w = p.exec(m)) ? (e.newFileMode = w[1], e.isNew = !0) : (w = T.exec(m)) ? (Z && (e.oldName = w[1]), e.isCopy = !0) : (w = D.exec(m)) ? (Z && (e.newName = w[1]), e.isCopy = !0) : (w = N.exec(m)) ? (Z && (e.oldName = w[1]), e.isRename = !0) : (w = x.exec(m)) ? (Z && (e.newName = w[1]), e.isRename = !0) : (w = l.exec(m)) ? (e.isBinary = !0, e.oldName = J(w[1], void 0, t.srcPrefix), e.newName = J(w[2], void 0, t.dstPrefix), k("Binary file")) : d.test(m) ? (e.isBinary = !0, k(m)) : (w = E.exec(m)) ? e.unchangedPercentage = parseInt(w[1], 10) : (w = O.exec(m)) ? e.changedPercentage = parseInt(w[1], 10) : (w = j.exec(m)) ? (e.checksumBefore = w[1], e.checksumAfter = w[2], w[3] && (e.mode = w[3])) : (w = b.exec(m)) ? (e.checksumBefore = [w[2], w[3]], e.checksumAfter = w[1]) : (w = C.exec(m)) ? (e.oldMode = [w[2], w[3]], e.newMode = w[1]) : (w = A.exec(m)) ? (e.newFileMode = w[1], e.isNew = !0) : (w = z.exec(m)) && (e.deletedFileMode = w[1], e.isDeleted = !0);
-  }), I(), X(), n;
+function ne(e, t = {}) {
+	let n = [], r = null, i = null, a = null, o = null, s = null, c = null, l = null, d = "--- ", f = "+++ ", p = /^old mode (\d{6})/, m = /^new mode (\d{6})/, h = /^deleted file mode (\d{6})/, g = /^new file mode (\d{6})/, _ = /^copy from "?(.+)"?/, v = /^copy to "?(.+)"?/, y = /^rename from "?(.+)"?/, S = /^rename to "?(.+)"?/, ne = /^similarity index (\d+)%/, w = /^dissimilarity index (\d+)%/, re = /^index ([\da-z]+)\.\.([\da-z]+)\s*(\d{6})?/, ie = /^Binary files (.*) and (.*) differ/, T = /^GIT binary patch/, E = /^index ([\da-z]+),([\da-z]+)\.\.([\da-z]+)/, D = /^mode (\d{6}),(\d{6})\.\.(\d{6})/, O = /^new file mode (\d{6})/, k = /^deleted file mode (\d{6}),(\d{6})/, A = e.replace(/\\ No newline at end of file/g, "").replace(/\r\n?/g, "\n").split("\n");
+	function j() {
+		i !== null && r !== null && (r.blocks.push(i), i = null);
+	}
+	function M() {
+		r !== null && (!r.oldName && c !== null && (r.oldName = c), !r.newName && l !== null && (r.newName = l), r.newName && (n.push(r), r = null)), c = null, l = null;
+	}
+	function N() {
+		j(), M(), r = {
+			blocks: [],
+			deletedLines: 0,
+			addedLines: 0
+		};
+	}
+	function P(e) {
+		j();
+		let t;
+		r !== null && ((t = /^@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@.*/.exec(e)) ? (r.isCombined = !1, a = parseInt(t[1], 10), s = parseInt(t[2], 10)) : (t = /^@@@ -(\d+)(?:,\d+)? -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@@.*/.exec(e)) ? (r.isCombined = !0, a = parseInt(t[1], 10), o = parseInt(t[2], 10), s = parseInt(t[3], 10)) : (e.startsWith("@@") && console.error("Failed to parse lines, starting in 0!"), a = 0, s = 0, r.isCombined = !1)), i = {
+			lines: [],
+			oldStartLine: a,
+			oldStartLine2: o,
+			newStartLine: s,
+			header: e
+		};
+	}
+	function F(e) {
+		if (r === null || i === null || a === null || s === null) return;
+		let t = { content: e }, n = r.isCombined ? [
+			"+ ",
+			" +",
+			"++"
+		] : ["+"], o = r.isCombined ? [
+			"- ",
+			" -",
+			"--"
+		] : ["-"];
+		x(e, n) ? (r.addedLines++, t.type = u.INSERT, t.oldNumber = void 0, t.newNumber = s++) : x(e, o) ? (r.deletedLines++, t.type = u.DELETE, t.oldNumber = a++, t.newNumber = void 0) : (t.type = u.CONTEXT, t.oldNumber = a++, t.newNumber = s++), i.lines.push(t);
+	}
+	function ae(e, t) {
+		let n = t;
+		for (; n < A.length - 3;) {
+			if (e.startsWith("diff")) return !1;
+			if (A[n].startsWith(d) && A[n + 1].startsWith(f) && A[n + 2].startsWith("@@")) return !0;
+			n++;
+		}
+		return !1;
+	}
+	return A.forEach((e, a) => {
+		if (!e || e.startsWith("*")) return;
+		let o, s = A[a - 1], u = A[a + 1], x = A[a + 2];
+		if (e.startsWith("diff --git") || e.startsWith("diff --combined")) {
+			if (N(), (o = /^diff --git "?([a-ciow]\/.+)"? "?([a-ciow]\/.+)"?/.exec(e)) && (c = C(o[1], void 0, t.dstPrefix), l = C(o[2], void 0, t.srcPrefix)), r === null) throw Error("Where is my file !!!");
+			r.isGitDiff = !0;
+			return;
+		}
+		if (e.startsWith("Binary files") && !r?.isGitDiff) {
+			if (N(), (o = /^Binary files "?([a-ciow]\/.+)"? and "?([a-ciow]\/.+)"? differ/.exec(e)) && (c = C(o[1], void 0, t.dstPrefix), l = C(o[2], void 0, t.srcPrefix)), r === null) throw Error("Where is my file !!!");
+			r.isBinary = !0;
+			return;
+		}
+		if ((!r || !r.isGitDiff && r && e.startsWith(d) && u.startsWith(f) && x.startsWith("@@")) && N(), r?.isTooBig) return;
+		if (r && (typeof t.diffMaxChanges == "number" && r.addedLines + r.deletedLines > t.diffMaxChanges || typeof t.diffMaxLineLength == "number" && e.length > t.diffMaxLineLength)) {
+			r.isTooBig = !0, r.addedLines = 0, r.deletedLines = 0, r.blocks = [], i = null, P(typeof t.diffTooBigMessage == "function" ? t.diffTooBigMessage(n.length) : "Diff too big to be displayed");
+			return;
+		}
+		if (e.startsWith(d) && u.startsWith(f) || e.startsWith(f) && s.startsWith(d)) {
+			if (r && !r.oldName && e.startsWith("--- ") && (o = ee(e, t.srcPrefix))) {
+				r.oldName = o, r.language = b(r.oldName, r.language);
+				return;
+			}
+			if (r && !r.newName && e.startsWith("+++ ") && (o = te(e, t.dstPrefix))) {
+				r.newName = o, r.language = b(r.newName, r.language);
+				return;
+			}
+		}
+		if (r && (e.startsWith("@@") || r.isGitDiff && r.oldName && r.newName && !i)) {
+			P(e);
+			return;
+		}
+		if (i && (e.startsWith("+") || e.startsWith("-") || e.startsWith(" "))) {
+			F(e);
+			return;
+		}
+		let j = !ae(e, a);
+		if (r === null) throw Error("Where is my file !!!");
+		(o = p.exec(e)) ? r.oldMode = o[1] : (o = m.exec(e)) ? r.newMode = o[1] : (o = h.exec(e)) ? (r.deletedFileMode = o[1], r.isDeleted = !0) : (o = g.exec(e)) ? (r.newFileMode = o[1], r.isNew = !0) : (o = _.exec(e)) ? (j && (r.oldName = o[1]), r.isCopy = !0) : (o = v.exec(e)) ? (j && (r.newName = o[1]), r.isCopy = !0) : (o = y.exec(e)) ? (j && (r.oldName = o[1]), r.isRename = !0) : (o = S.exec(e)) ? (j && (r.newName = o[1]), r.isRename = !0) : (o = ie.exec(e)) ? (r.isBinary = !0, r.oldName = C(o[1], void 0, t.srcPrefix), r.newName = C(o[2], void 0, t.dstPrefix), P("Binary file")) : T.test(e) ? (r.isBinary = !0, P(e)) : (o = ne.exec(e)) ? r.unchangedPercentage = parseInt(o[1], 10) : (o = w.exec(e)) ? r.changedPercentage = parseInt(o[1], 10) : (o = re.exec(e)) ? (r.checksumBefore = o[1], r.checksumAfter = o[2], o[3] && (r.mode = o[3])) : (o = E.exec(e)) ? (r.checksumBefore = [o[2], o[3]], r.checksumAfter = o[1]) : (o = D.exec(e)) ? (r.oldMode = [o[2], o[3]], r.newMode = o[1]) : (o = O.exec(e)) ? (r.newFileMode = o[1], r.isNew = !0) : (o = k.exec(e)) && (r.deletedFileMode = o[1], r.isDeleted = !0);
+	}), j(), M(), n;
 }
-function W() {
+//#endregion
+//#region node_modules/diff/libesm/diff/base.js
+var w = class {
+	diff(e, t, n = {}) {
+		let r;
+		typeof n == "function" ? (r = n, n = {}) : "callback" in n && (r = n.callback);
+		let i = this.castInput(e, n), a = this.castInput(t, n), o = this.removeEmpty(this.tokenize(i, n)), s = this.removeEmpty(this.tokenize(a, n));
+		return this.diffWithOptionsObj(o, s, n, r);
+	}
+	diffWithOptionsObj(e, t, n, r) {
+		let i = (e) => {
+			if (e = this.postProcess(e, n), r) {
+				setTimeout(function() {
+					r(e);
+				}, 0);
+				return;
+			} else return e;
+		}, a = t.length, o = e.length, s = 1, c = a + o;
+		n.maxEditLength != null && (c = Math.min(c, n.maxEditLength));
+		let l = n.timeout ?? Infinity, u = Date.now() + l, d = [{
+			oldPos: -1,
+			lastComponent: void 0
+		}], f = this.extractCommon(d[0], t, e, 0, n);
+		if (d[0].oldPos + 1 >= o && f + 1 >= a) return i(this.buildValues(d[0].lastComponent, t, e));
+		let p = -Infinity, m = Infinity, h = () => {
+			for (let r = Math.max(p, -s); r <= Math.min(m, s); r += 2) {
+				let s, c = d[r - 1], l = d[r + 1];
+				c && (d[r - 1] = void 0);
+				let u = !1;
+				if (l) {
+					let e = l.oldPos - r;
+					u = l && 0 <= e && e < a;
+				}
+				let h = c && c.oldPos + 1 < o;
+				if (!u && !h) {
+					d[r] = void 0;
+					continue;
+				}
+				if (s = !h || u && c.oldPos < l.oldPos ? this.addToPath(l, !0, !1, 0, n) : this.addToPath(c, !1, !0, 1, n), f = this.extractCommon(s, t, e, r, n), s.oldPos + 1 >= o && f + 1 >= a) return i(this.buildValues(s.lastComponent, t, e)) || !0;
+				d[r] = s, s.oldPos + 1 >= o && (m = Math.min(m, r - 1)), f + 1 >= a && (p = Math.max(p, r + 1));
+			}
+			s++;
+		};
+		if (r) (function e() {
+			setTimeout(function() {
+				if (s > c || Date.now() > u) return r(void 0);
+				h() || e();
+			}, 0);
+		})();
+		else for (; s <= c && Date.now() <= u;) {
+			let e = h();
+			if (e) return e;
+		}
+	}
+	addToPath(e, t, n, r, i) {
+		let a = e.lastComponent;
+		return a && !i.oneChangePerToken && a.added === t && a.removed === n ? {
+			oldPos: e.oldPos + r,
+			lastComponent: {
+				count: a.count + 1,
+				added: t,
+				removed: n,
+				previousComponent: a.previousComponent
+			}
+		} : {
+			oldPos: e.oldPos + r,
+			lastComponent: {
+				count: 1,
+				added: t,
+				removed: n,
+				previousComponent: a
+			}
+		};
+	}
+	extractCommon(e, t, n, r, i) {
+		let a = t.length, o = n.length, s = e.oldPos, c = s - r, l = 0;
+		for (; c + 1 < a && s + 1 < o && this.equals(n[s + 1], t[c + 1], i);) c++, s++, l++, i.oneChangePerToken && (e.lastComponent = {
+			count: 1,
+			previousComponent: e.lastComponent,
+			added: !1,
+			removed: !1
+		});
+		return l && !i.oneChangePerToken && (e.lastComponent = {
+			count: l,
+			previousComponent: e.lastComponent,
+			added: !1,
+			removed: !1
+		}), e.oldPos = s, c;
+	}
+	equals(e, t, n) {
+		return n.comparator ? n.comparator(e, t) : e === t || !!n.ignoreCase && e.toLowerCase() === t.toLowerCase();
+	}
+	removeEmpty(e) {
+		let t = [];
+		for (let n = 0; n < e.length; n++) e[n] && t.push(e[n]);
+		return t;
+	}
+	castInput(e, t) {
+		return e;
+	}
+	tokenize(e, t) {
+		return Array.from(e);
+	}
+	join(e) {
+		return e.join("");
+	}
+	postProcess(e, t) {
+		return e;
+	}
+	get useLongestToken() {
+		return !1;
+	}
+	buildValues(e, t, n) {
+		let r = [], i;
+		for (; e;) r.push(e), i = e.previousComponent, delete e.previousComponent, e = i;
+		r.reverse();
+		let a = r.length, o = 0, s = 0, c = 0;
+		for (; o < a; o++) {
+			let e = r[o];
+			if (e.removed) e.value = this.join(n.slice(c, c + e.count)), c += e.count;
+			else {
+				if (!e.added && this.useLongestToken) {
+					let r = t.slice(s, s + e.count);
+					r = r.map(function(e, t) {
+						let r = n[c + t];
+						return r.length > e.length ? r : e;
+					}), e.value = this.join(r);
+				} else e.value = this.join(t.slice(s, s + e.count));
+				s += e.count, e.added || (c += e.count);
+			}
+		}
+		return r;
+	}
+}, re = new class extends w {}();
+function ie(e, t, n) {
+	return re.diff(e, t, n);
 }
-W.prototype = {
-  diff: function(t, n) {
-    var e, r = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : {}, s = r.callback;
-    typeof r == "function" && (s = r, r = {});
-    var a = this;
-    function u(x) {
-      return x = a.postProcess(x, r), s ? (setTimeout(function() {
-        s(x);
-      }, 0), !0) : x;
-    }
-    t = this.castInput(t, r), n = this.castInput(n, r), t = this.removeEmpty(this.tokenize(t, r)), n = this.removeEmpty(this.tokenize(n, r));
-    var c = n.length, h = t.length, g = 1, y = c + h;
-    r.maxEditLength != null && (y = Math.min(y, r.maxEditLength));
-    var L = (e = r.timeout) !== null && e !== void 0 ? e : 1 / 0, o = Date.now() + L, f = [{
-      oldPos: -1,
-      lastComponent: void 0
-    }], v = this.extractCommon(f[0], n, t, 0, r);
-    if (f[0].oldPos + 1 >= h && v + 1 >= c)
-      return u(Re(a, f[0].lastComponent, n, t, a.useLongestToken));
-    var p = -1 / 0, T = 1 / 0;
-    function D() {
-      for (var x = Math.max(p, -g); x <= Math.min(T, g); x += 2) {
-        var E = void 0, O = f[x - 1], j = f[x + 1];
-        O && (f[x - 1] = void 0);
-        var l = !1;
-        if (j) {
-          var d = j.oldPos - x;
-          l = j && 0 <= d && d < c;
-        }
-        var b = O && O.oldPos + 1 < h;
-        if (!l && !b) {
-          f[x] = void 0;
-          continue;
-        }
-        if (!b || l && O.oldPos < j.oldPos ? E = a.addToPath(j, !0, !1, 0, r) : E = a.addToPath(O, !1, !0, 1, r), v = a.extractCommon(E, n, t, x, r), E.oldPos + 1 >= h && v + 1 >= c)
-          return u(Re(a, E.lastComponent, n, t, a.useLongestToken));
-        f[x] = E, E.oldPos + 1 >= h && (T = Math.min(T, x - 1)), v + 1 >= c && (p = Math.max(p, x + 1));
-      }
-      g++;
-    }
-    if (s)
-      (function x() {
-        setTimeout(function() {
-          if (g > y || Date.now() > o)
-            return s();
-          D() || x();
-        }, 0);
-      })();
-    else
-      for (; g <= y && Date.now() <= o; ) {
-        var N = D();
-        if (N)
-          return N;
-      }
-  },
-  addToPath: function(t, n, e, r, s) {
-    var a = t.lastComponent;
-    return a && !s.oneChangePerToken && a.added === n && a.removed === e ? {
-      oldPos: t.oldPos + r,
-      lastComponent: {
-        count: a.count + 1,
-        added: n,
-        removed: e,
-        previousComponent: a.previousComponent
-      }
-    } : {
-      oldPos: t.oldPos + r,
-      lastComponent: {
-        count: 1,
-        added: n,
-        removed: e,
-        previousComponent: a
-      }
-    };
-  },
-  extractCommon: function(t, n, e, r, s) {
-    for (var a = n.length, u = e.length, c = t.oldPos, h = c - r, g = 0; h + 1 < a && c + 1 < u && this.equals(e[c + 1], n[h + 1], s); )
-      h++, c++, g++, s.oneChangePerToken && (t.lastComponent = {
-        count: 1,
-        previousComponent: t.lastComponent,
-        added: !1,
-        removed: !1
-      });
-    return g && !s.oneChangePerToken && (t.lastComponent = {
-      count: g,
-      previousComponent: t.lastComponent,
-      added: !1,
-      removed: !1
-    }), t.oldPos = c, h;
-  },
-  equals: function(t, n, e) {
-    return e.comparator ? e.comparator(t, n) : t === n || e.ignoreCase && t.toLowerCase() === n.toLowerCase();
-  },
-  removeEmpty: function(t) {
-    for (var n = [], e = 0; e < t.length; e++)
-      t[e] && n.push(t[e]);
-    return n;
-  },
-  castInput: function(t) {
-    return t;
-  },
-  tokenize: function(t) {
-    return Array.from(t);
-  },
-  join: function(t) {
-    return t.join("");
-  },
-  postProcess: function(t) {
-    return t;
-  }
-};
-function Re(i, t, n, e, r) {
-  for (var s = [], a; t; )
-    s.push(t), a = t.previousComponent, delete t.previousComponent, t = a;
-  s.reverse();
-  for (var u = 0, c = s.length, h = 0, g = 0; u < c; u++) {
-    var y = s[u];
-    if (y.removed)
-      y.value = i.join(e.slice(g, g + y.count)), g += y.count;
-    else {
-      if (!y.added && r) {
-        var L = n.slice(h, h + y.count);
-        L = L.map(function(o, f) {
-          var v = e[g + f];
-          return v.length > o.length ? v : o;
-        }), y.value = i.join(L);
-      } else
-        y.value = i.join(n.slice(h, h + y.count));
-      h += y.count, y.added || (g += y.count);
-    }
-  }
-  return s;
+//#endregion
+//#region node_modules/diff/libesm/util/string.js
+function T(e, t) {
+	let n;
+	for (n = 0; n < e.length && n < t.length; n++) if (e[n] != t[n]) return e.slice(0, n);
+	return e.slice(0, n);
 }
-var ot = new W();
-function ft(i, t, n) {
-  return ot.diff(i, t, n);
+function E(e, t) {
+	let n;
+	if (!e || !t || e[e.length - 1] != t[t.length - 1]) return "";
+	for (n = 0; n < e.length && n < t.length; n++) if (e[e.length - (n + 1)] != t[t.length - (n + 1)]) return e.slice(-n);
+	return e.slice(-n);
 }
-function Pe(i, t) {
-  var n;
-  for (n = 0; n < i.length && n < t.length; n++)
-    if (i[n] != t[n])
-      return i.slice(0, n);
-  return i.slice(0, n);
+function D(e, t, n) {
+	if (e.slice(0, t.length) != t) throw Error(`string ${JSON.stringify(e)} doesn't start with prefix ${JSON.stringify(t)}; this is a bug`);
+	return n + e.slice(t.length);
 }
-function ze(i, t) {
-  var n;
-  if (!i || !t || i[i.length - 1] != t[t.length - 1])
-    return "";
-  for (n = 0; n < i.length && n < t.length; n++)
-    if (i[i.length - (n + 1)] != t[t.length - (n + 1)])
-      return i.slice(-n);
-  return i.slice(-n);
+function O(e, t, n) {
+	if (!t) return e + n;
+	if (e.slice(-t.length) != t) throw Error(`string ${JSON.stringify(e)} doesn't end with suffix ${JSON.stringify(t)}; this is a bug`);
+	return e.slice(0, -t.length) + n;
 }
-function ye(i, t, n) {
-  if (i.slice(0, t.length) != t)
-    throw Error("string ".concat(JSON.stringify(i), " doesn't start with prefix ").concat(JSON.stringify(t), "; this is a bug"));
-  return n + i.slice(t.length);
+function k(e, t) {
+	return D(e, t, "");
 }
-function Te(i, t, n) {
-  if (!t)
-    return i + n;
-  if (i.slice(-t.length) != t)
-    throw Error("string ".concat(JSON.stringify(i), " doesn't end with suffix ").concat(JSON.stringify(t), "; this is a bug"));
-  return i.slice(0, -t.length) + n;
+function A(e, t) {
+	return O(e, t, "");
 }
-function re(i, t) {
-  return ye(i, t, "");
+function j(e, t) {
+	return t.slice(0, M(e, t));
 }
-function oe(i, t) {
-  return Te(i, t, "");
+function M(e, t) {
+	let n = 0;
+	e.length > t.length && (n = e.length - t.length);
+	let r = t.length;
+	e.length < t.length && (r = e.length);
+	let i = Array(r), a = 0;
+	i[0] = 0;
+	for (let e = 1; e < r; e++) {
+		for (t[e] == t[a] ? i[e] = i[a] : i[e] = a; a > 0 && t[e] != t[a];) a = i[a];
+		t[e] == t[a] && a++;
+	}
+	a = 0;
+	for (let r = n; r < e.length; r++) {
+		for (; a > 0 && e[r] != t[a];) a = i[a];
+		e[r] == t[a] && a++;
+	}
+	return a;
 }
-function ke(i, t) {
-  return t.slice(0, ct(i, t));
+function N(e) {
+	let t;
+	for (t = e.length - 1; t >= 0 && e[t].match(/\s/); t--);
+	return e.substring(t + 1);
 }
-function ct(i, t) {
-  var n = 0;
-  i.length > t.length && (n = i.length - t.length);
-  var e = t.length;
-  i.length < t.length && (e = i.length);
-  var r = Array(e), s = 0;
-  r[0] = 0;
-  for (var a = 1; a < e; a++) {
-    for (t[a] == t[s] ? r[a] = r[s] : r[a] = s; s > 0 && t[a] != t[s]; )
-      s = r[s];
-    t[a] == t[s] && s++;
-  }
-  s = 0;
-  for (var u = n; u < i.length; u++) {
-    for (; s > 0 && i[u] != t[s]; )
-      s = r[s];
-    i[u] == t[s] && s++;
-  }
-  return s;
+function P(e) {
+	let t = e.match(/^\s*/);
+	return t ? t[0] : "";
 }
-var fe = "a-zA-Z0-9_\\u{C0}-\\u{FF}\\u{D8}-\\u{F6}\\u{F8}-\\u{2C6}\\u{2C8}-\\u{2D7}\\u{2DE}-\\u{2FF}\\u{1E00}-\\u{1EFF}", ut = new RegExp("[".concat(fe, "]+|\\s+|[^").concat(fe, "]"), "ug"), ue = new W();
-ue.equals = function(i, t, n) {
-  return n.ignoreCase && (i = i.toLowerCase(), t = t.toLowerCase()), i.trim() === t.trim();
-};
-ue.tokenize = function(i) {
-  var t = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {}, n;
-  if (t.intlSegmenter) {
-    if (t.intlSegmenter.resolvedOptions().granularity != "word")
-      throw new Error('The segmenter passed must have a granularity of "word"');
-    n = Array.from(t.intlSegmenter.segment(i), function(s) {
-      return s.segment;
-    });
-  } else
-    n = i.match(ut) || [];
-  var e = [], r = null;
-  return n.forEach(function(s) {
-    /\s/.test(s) ? r == null ? e.push(s) : e.push(e.pop() + s) : /\s/.test(r) ? e[e.length - 1] == r ? e.push(e.pop() + s) : e.push(r + s) : e.push(s), r = s;
-  }), e;
-};
-ue.join = function(i) {
-  return i.map(function(t, n) {
-    return n == 0 ? t : t.replace(/^\s+/, "");
-  }).join("");
-};
-ue.postProcess = function(i, t) {
-  if (!i || t.oneChangePerToken)
-    return i;
-  var n = null, e = null, r = null;
-  return i.forEach(function(s) {
-    s.added ? e = s : s.removed ? r = s : ((e || r) && $e(n, r, e, s), n = s, e = null, r = null);
-  }), (e || r) && $e(n, r, e, null), i;
-};
-function $e(i, t, n, e) {
-  if (t && n) {
-    var r = t.value.match(/^\s*/)[0], s = t.value.match(/\s*$/)[0], a = n.value.match(/^\s*/)[0], u = n.value.match(/\s*$/)[0];
-    if (i) {
-      var c = Pe(r, a);
-      i.value = Te(i.value, a, c), t.value = re(t.value, c), n.value = re(n.value, c);
-    }
-    if (e) {
-      var h = ze(s, u);
-      e.value = ye(e.value, u, h), t.value = oe(t.value, h), n.value = oe(n.value, h);
-    }
-  } else if (n)
-    i && (n.value = n.value.replace(/^\s*/, "")), e && (e.value = e.value.replace(/^\s*/, ""));
-  else if (i && e) {
-    var g = e.value.match(/^\s*/)[0], y = t.value.match(/^\s*/)[0], L = t.value.match(/\s*$/)[0], o = Pe(g, y);
-    t.value = re(t.value, o);
-    var f = ze(re(g, o), L);
-    t.value = oe(t.value, f), e.value = ye(e.value, g, f), i.value = Te(i.value, g, g.slice(0, g.length - f.length));
-  } else if (e) {
-    var v = e.value.match(/^\s*/)[0], p = t.value.match(/\s*$/)[0], T = ke(p, v);
-    t.value = oe(t.value, T);
-  } else if (i) {
-    var D = i.value.match(/\s*$/)[0], N = t.value.match(/^\s*/)[0], x = ke(D, N);
-    t.value = re(t.value, x);
-  }
+//#endregion
+//#region node_modules/diff/libesm/diff/word.js
+var F = "a-zA-Z0-9_\\u{AD}\\u{C0}-\\u{D6}\\u{D8}-\\u{F6}\\u{F8}-\\u{2C6}\\u{2C8}-\\u{2D7}\\u{2DE}-\\u{2FF}\\u{1E00}-\\u{1EFF}", ae = RegExp(`[${F}]+|\\s+|[^${F}]`, "ug");
+new class extends w {
+	equals(e, t, n) {
+		return n.ignoreCase && (e = e.toLowerCase(), t = t.toLowerCase()), e.trim() === t.trim();
+	}
+	tokenize(e, t = {}) {
+		let n;
+		if (t.intlSegmenter) {
+			let r = t.intlSegmenter;
+			if (r.resolvedOptions().granularity != "word") throw Error("The segmenter passed must have a granularity of \"word\"");
+			n = [];
+			for (let t of Array.from(r.segment(e))) {
+				let e = t.segment;
+				n.length && /\s/.test(n[n.length - 1]) && /\s/.test(e) ? n[n.length - 1] += e : n.push(e);
+			}
+		} else n = e.match(ae) || [];
+		let r = [], i = null;
+		return n.forEach((e) => {
+			/\s/.test(e) ? i == null ? r.push(e) : r.push(r.pop() + e) : i != null && /\s/.test(i) ? r[r.length - 1] == i ? r.push(r.pop() + e) : r.push(i + e) : r.push(e), i = e;
+		}), r;
+	}
+	join(e) {
+		return e.map((e, t) => t == 0 ? e : e.replace(/^\s+/, "")).join("");
+	}
+	postProcess(e, t) {
+		if (!e || t.oneChangePerToken) return e;
+		let n = null, r = null, i = null;
+		return e.forEach((e) => {
+			e.added ? r = e : e.removed ? i = e : ((r || i) && oe(n, i, r, e), n = e, r = null, i = null);
+		}), (r || i) && oe(n, i, r, null), e;
+	}
+}();
+function oe(e, t, n, r) {
+	if (t && n) {
+		let i = P(t.value), a = N(t.value), o = P(n.value), s = N(n.value);
+		if (e) {
+			let r = T(i, o);
+			e.value = O(e.value, o, r), t.value = k(t.value, r), n.value = k(n.value, r);
+		}
+		if (r) {
+			let e = E(a, s);
+			r.value = D(r.value, s, e), t.value = A(t.value, e), n.value = A(n.value, e);
+		}
+	} else if (n) {
+		if (e) {
+			let e = P(n.value);
+			n.value = n.value.substring(e.length);
+		}
+		if (r) {
+			let e = P(r.value);
+			r.value = r.value.substring(e.length);
+		}
+	} else if (e && r) {
+		let n = P(r.value), i = P(t.value), a = N(t.value), o = T(n, i);
+		t.value = k(t.value, o);
+		let s = E(k(n, o), a);
+		t.value = A(t.value, s), r.value = D(r.value, n, s), e.value = O(e.value, n, n.slice(0, n.length - s.length));
+	} else if (r) {
+		let e = P(r.value), n = j(N(t.value), e);
+		t.value = A(t.value, n);
+	} else if (e) {
+		let n = j(N(e.value), P(t.value));
+		t.value = k(t.value, n);
+	}
 }
-var Xe = new W();
-Xe.tokenize = function(i) {
-  var t = new RegExp("(\\r?\\n)|[".concat(fe, "]+|[^\\S\\n\\r]+|[^").concat(fe, "]"), "ug");
-  return i.match(t) || [];
-};
-function dt(i, t, n) {
-  return Xe.diff(i, t, n);
+var se = new class extends w {
+	tokenize(e) {
+		let t = RegExp(`(\\r?\\n)|[${F}]+|[^\\S\\n\\r]+|[^${F}]`, "ug");
+		return e.match(t) || [];
+	}
+}();
+function ce(e, t, n) {
+	return se.diff(e, t, n);
 }
-var Ee = new W();
-Ee.tokenize = function(i, t) {
-  t.stripTrailingCr && (i = i.replace(/\r\n/g, `
-`));
-  var n = [], e = i.split(/(\n|\r\n)/);
-  e[e.length - 1] || e.pop();
-  for (var r = 0; r < e.length; r++) {
-    var s = e[r];
-    r % 2 && !t.newlineIsToken ? n[n.length - 1] += s : n.push(s);
-  }
-  return n;
-};
-Ee.equals = function(i, t, n) {
-  return n.ignoreWhitespace ? ((!n.newlineIsToken || !i.includes(`
-`)) && (i = i.trim()), (!n.newlineIsToken || !t.includes(`
-`)) && (t = t.trim())) : n.ignoreNewlineAtEof && !n.newlineIsToken && (i.endsWith(`
-`) && (i = i.slice(0, -1)), t.endsWith(`
-`) && (t = t.slice(0, -1))), W.prototype.equals.call(this, i, t, n);
-};
-var ht = new W();
-ht.tokenize = function(i) {
-  return i.split(/(\S.+?[.!?])(?=\s+|$)/);
-};
-var pt = new W();
-pt.tokenize = function(i) {
-  return i.split(/([{}:;,]|\s+)/);
-};
-function Ne(i) {
-  "@babel/helpers - typeof";
-  return Ne = typeof Symbol == "function" && typeof Symbol.iterator == "symbol" ? function(t) {
-    return typeof t;
-  } : function(t) {
-    return t && typeof Symbol == "function" && t.constructor === Symbol && t !== Symbol.prototype ? "symbol" : typeof t;
-  }, Ne(i);
+new class extends w {
+	constructor() {
+		super(...arguments), this.tokenize = le;
+	}
+	equals(e, t, n) {
+		return n.ignoreWhitespace ? ((!n.newlineIsToken || !e.includes("\n")) && (e = e.trim()), (!n.newlineIsToken || !t.includes("\n")) && (t = t.trim())) : n.ignoreNewlineAtEof && !n.newlineIsToken && (e.endsWith("\n") && (e = e.slice(0, -1)), t.endsWith("\n") && (t = t.slice(0, -1))), super.equals(e, t, n);
+	}
+}();
+function le(e, t) {
+	t.stripTrailingCr && (e = e.replace(/\r\n/g, "\n"));
+	let n = [], r = e.split(/(\n|\r\n)/);
+	r[r.length - 1] || r.pop();
+	for (let e = 0; e < r.length; e++) {
+		let i = r[e];
+		e % 2 && !t.newlineIsToken ? n[n.length - 1] += i : n.push(i);
+	}
+	return n;
 }
-var le = new W();
-le.useLongestToken = !0;
-le.tokenize = Ee.tokenize;
-le.castInput = function(i, t) {
-  var n = t.undefinedReplacement, e = t.stringifyReplacer, r = e === void 0 ? function(s, a) {
-    return typeof a > "u" ? n : a;
-  } : e;
-  return typeof i == "string" ? i : JSON.stringify(Ce(i, null, null, r), r, "  ");
-};
-le.equals = function(i, t, n) {
-  return W.prototype.equals.call(le, i.replace(/,([\r\n])/g, "$1"), t.replace(/,([\r\n])/g, "$1"), n);
-};
-function Ce(i, t, n, e, r) {
-  t = t || [], n = n || [], e && (i = e(r, i));
-  var s;
-  for (s = 0; s < t.length; s += 1)
-    if (t[s] === i)
-      return n[s];
-  var a;
-  if (Object.prototype.toString.call(i) === "[object Array]") {
-    for (t.push(i), a = new Array(i.length), n.push(a), s = 0; s < i.length; s += 1)
-      a[s] = Ce(i[s], t, n, e, r);
-    return t.pop(), n.pop(), a;
-  }
-  if (i && i.toJSON && (i = i.toJSON()), Ne(i) === "object" && i !== null) {
-    t.push(i), a = {}, n.push(a);
-    var u = [], c;
-    for (c in i)
-      Object.prototype.hasOwnProperty.call(i, c) && u.push(c);
-    for (u.sort(), s = 0; s < u.length; s += 1)
-      c = u[s], a[c] = Ce(i[c], t, n, e, c);
-    t.pop(), n.pop();
-  } else
-    a = i;
-  return a;
+//#endregion
+//#region node_modules/diff/libesm/diff/sentence.js
+function ue(e) {
+	return e == "." || e == "!" || e == "?";
 }
-var xe = new W();
-xe.tokenize = function(i) {
-  return i.slice();
-};
-xe.join = xe.removeEmpty = function(i) {
-  return i;
-};
-function mt(i, t) {
-  if (i.length === 0)
-    return t.length;
-  if (t.length === 0)
-    return i.length;
-  const n = [];
-  let e;
-  for (e = 0; e <= t.length; e++)
-    n[e] = [e];
-  let r;
-  for (r = 0; r <= i.length; r++)
-    n[0][r] = r;
-  for (e = 1; e <= t.length; e++)
-    for (r = 1; r <= i.length; r++)
-      t.charAt(e - 1) === i.charAt(r - 1) ? n[e][r] = n[e - 1][r - 1] : n[e][r] = Math.min(n[e - 1][r - 1] + 1, Math.min(n[e][r - 1] + 1, n[e - 1][r] + 1));
-  return n[t.length][i.length];
+new class extends w {
+	tokenize(e) {
+		let t = [], n = 0;
+		for (let r = 0; r < e.length; r++) {
+			if (r == e.length - 1) {
+				t.push(e.slice(n));
+				break;
+			}
+			if (ue(e[r]) && e[r + 1].match(/\s/)) {
+				for (t.push(e.slice(n, r + 1)), r = n = r + 1; e[r + 1]?.match(/\s/);) r++;
+				t.push(e.slice(n, r + 1)), n = r + 1;
+			}
+		}
+		return t;
+	}
+}(), new class extends w {
+	tokenize(e) {
+		return e.split(/([{}:;,]|\s+)/);
+	}
+}(), new class extends w {
+	constructor() {
+		super(...arguments), this.tokenize = le;
+	}
+	get useLongestToken() {
+		return !0;
+	}
+	castInput(e, t) {
+		let { undefinedReplacement: n, stringifyReplacer: r = (e, t) => t === void 0 ? n : t } = t;
+		return typeof e == "string" ? e : JSON.stringify(I(e, null, null, r), null, "  ");
+	}
+	equals(e, t, n) {
+		return super.equals(e.replace(/,([\r\n])/g, "$1"), t.replace(/,([\r\n])/g, "$1"), n);
+	}
+}();
+function I(e, t, n, r, i) {
+	t ||= [], n ||= [], r && (e = r(i === void 0 ? "" : i, e));
+	let a;
+	for (a = 0; a < t.length; a += 1) if (t[a] === e) return n[a];
+	let o;
+	if (Object.prototype.toString.call(e) === "[object Array]") {
+		for (t.push(e), o = Array(e.length), n.push(o), a = 0; a < e.length; a += 1) o[a] = I(e[a], t, n, r, String(a));
+		return t.pop(), n.pop(), o;
+	}
+	if (e && e.toJSON && (e = e.toJSON()), typeof e == "object" && e) {
+		t.push(e), o = {}, n.push(o);
+		let i = [], s;
+		for (s in e)
+ /* istanbul ignore else */
+		Object.prototype.hasOwnProperty.call(e, s) && i.push(s);
+		for (i.sort(), a = 0; a < i.length; a += 1) s = i[a], o[s] = I(e[s], t, n, r, s);
+		t.pop(), n.pop();
+	} else o = e;
+	return o;
 }
-function Le(i) {
-  return (t, n) => {
-    const e = i(t).trim(), r = i(n).trim();
-    return mt(e, r) / (e.length + r.length);
-  };
+new class extends w {
+	tokenize(e) {
+		return e.slice();
+	}
+	join(e) {
+		return e;
+	}
+	removeEmpty(e) {
+		return e;
+	}
+}();
+//#endregion
+//#region node_modules/diff2html/lib-esm/rematch.js
+function de(e, t) {
+	if (e.length === 0) return t.length;
+	if (t.length === 0) return e.length;
+	let n = [], r;
+	for (r = 0; r <= t.length; r++) n[r] = [r];
+	let i;
+	for (i = 0; i <= e.length; i++) n[0][i] = i;
+	for (r = 1; r <= t.length; r++) for (i = 1; i <= e.length; i++) t.charAt(r - 1) === e.charAt(i - 1) ? n[r][i] = n[r - 1][i - 1] : n[r][i] = Math.min(n[r - 1][i - 1] + 1, Math.min(n[r][i - 1] + 1, n[r - 1][i] + 1));
+	return n[t.length][e.length];
 }
-function Se(i) {
-  function t(e, r, s = /* @__PURE__ */ new Map()) {
-    let a = 1 / 0, u;
-    for (let c = 0; c < e.length; ++c)
-      for (let h = 0; h < r.length; ++h) {
-        const g = JSON.stringify([e[c], r[h]]);
-        let y;
-        s.has(g) && (y = s.get(g)) || (y = i(e[c], r[h]), s.set(g, y)), y < a && (a = y, u = { indexA: c, indexB: h, score: a });
-      }
-    return u;
-  }
-  function n(e, r, s = 0, a = /* @__PURE__ */ new Map()) {
-    const u = t(e, r, a);
-    if (!u || e.length + r.length < 3)
-      return [[e, r]];
-    const c = e.slice(0, u.indexA), h = r.slice(0, u.indexB), g = [e[u.indexA]], y = [r[u.indexB]], L = u.indexA + 1, o = u.indexB + 1, f = e.slice(L), v = r.slice(o), p = n(c, h, s + 1, a), T = n(g, y, s + 1, a), D = n(f, v, s + 1, a);
-    let N = T;
-    return (u.indexA > 0 || u.indexB > 0) && (N = p.concat(N)), (e.length > L || r.length > o) && (N = N.concat(D)), N;
-  }
-  return n;
+function L(e) {
+	return (t, n) => {
+		let r = e(t).trim(), i = e(n).trim();
+		return de(r, i) / (r.length + i.length);
+	};
 }
-const R = {
-  INSERTS: "d2h-ins",
-  DELETES: "d2h-del",
-  CONTEXT: "d2h-cntx",
-  INFO: "d2h-info",
-  INSERT_CHANGES: "d2h-ins d2h-change",
-  DELETE_CHANGES: "d2h-del d2h-change"
-}, de = {
-  matching: et.NONE,
-  matchWordsThreshold: 0.25,
-  maxLineLengthHighlight: 1e4,
-  diffStyle: tt.WORD,
-  colorScheme: ee.LIGHT
-}, U = "/", Je = Le((i) => i.value), bt = Se(Je);
-function be(i) {
-  return i.indexOf("dev/null") !== -1;
+function R(e) {
+	function t(t, n, r = /* @__PURE__ */ new Map()) {
+		let i = Infinity, a;
+		for (let o = 0; o < t.length; ++o) for (let s = 0; s < n.length; ++s) {
+			let c = JSON.stringify([t[o], n[s]]), l;
+			r.has(c) && (l = r.get(c)) || (l = e(t[o], n[s]), r.set(c, l)), l < i && (i = l, a = {
+				indexA: o,
+				indexB: s,
+				score: i
+			});
+		}
+		return a;
+	}
+	function n(e, r, i = 0, a = /* @__PURE__ */ new Map()) {
+		let o = t(e, r, a);
+		if (!o || e.length + r.length < 3) return [[e, r]];
+		let s = e.slice(0, o.indexA), c = r.slice(0, o.indexB), l = [e[o.indexA]], u = [r[o.indexB]], d = o.indexA + 1, f = o.indexB + 1, p = e.slice(d), m = r.slice(f), h = n(s, c, i + 1, a), g = n(l, u, i + 1, a), _ = n(p, m, i + 1, a), v = g;
+		return (o.indexA > 0 || o.indexB > 0) && (v = h.concat(v)), (e.length > d || r.length > f) && (v = v.concat(_)), v;
+	}
+	return n;
 }
-function gt(i) {
-  return i.replace(/(<ins[^>]*>((.|\n)*?)<\/ins>)/g, "");
+//#endregion
+//#region node_modules/diff2html/lib-esm/render-utils.js
+var z = {
+	INSERTS: "d2h-ins",
+	DELETES: "d2h-del",
+	CONTEXT: "d2h-cntx",
+	INFO: "d2h-info",
+	INSERT_CHANGES: "d2h-ins d2h-change",
+	DELETE_CHANGES: "d2h-del d2h-change"
+}, B = {
+	matching: f.NONE,
+	matchWordsThreshold: .25,
+	maxLineLengthHighlight: 1e4,
+	diffStyle: p.WORD,
+	colorScheme: m.LIGHT
+}, V = "/", fe = L((e) => e.value), pe = R(fe);
+function H(e) {
+	return e.indexOf("dev/null") !== -1;
 }
-function vt(i) {
-  return i.replace(/(<del[^>]*>((.|\n)*?)<\/del>)/g, "");
+function me(e) {
+	return e.replace(/(<ins[^>]*>((.|\n)*?)<\/ins>)/g, "");
 }
-function ce(i) {
-  switch (i) {
-    case H.CONTEXT:
-      return R.CONTEXT;
-    case H.INSERT:
-      return R.INSERTS;
-    case H.DELETE:
-      return R.DELETES;
-  }
+function he(e) {
+	return e.replace(/(<del[^>]*>((.|\n)*?)<\/del>)/g, "");
 }
-function Oe(i) {
-  switch (i) {
-    case ee.DARK:
-      return "d2h-dark-color-scheme";
-    case ee.AUTO:
-      return "d2h-auto-color-scheme";
-    case ee.LIGHT:
-    default:
-      return "d2h-light-color-scheme";
-  }
+function U(e) {
+	switch (e) {
+		case u.CONTEXT: return z.CONTEXT;
+		case u.INSERT: return z.INSERTS;
+		case u.DELETE: return z.DELETES;
+	}
 }
-function wt(i) {
-  return i ? 2 : 1;
+function W(e) {
+	switch (e) {
+		case m.DARK: return "d2h-dark-color-scheme";
+		case m.AUTO: return "d2h-auto-color-scheme";
+		case m.LIGHT:
+		default: return "d2h-light-color-scheme";
+	}
 }
-function te(i) {
-  return i.slice(0).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#x27;").replace(/\//g, "&#x2F;");
+function ge(e) {
+	return e ? 2 : 1;
 }
-function _(i, t, n = !0) {
-  const e = wt(t);
-  return {
-    prefix: i.substring(0, e),
-    content: n ? te(i.substring(e)) : i.substring(e)
-  };
+function G(e) {
+	return e.slice(0).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#x27;").replace(/\//g, "&#x2F;");
 }
-function he(i) {
-  const t = He(i.oldName), n = He(i.newName);
-  if (t !== n && !be(t) && !be(n)) {
-    const e = [], r = [], s = t.split(U), a = n.split(U), u = s.length, c = a.length;
-    let h = 0, g = u - 1, y = c - 1;
-    for (; h < g && h < y && s[h] === a[h]; )
-      e.push(a[h]), h += 1;
-    for (; g > h && y > h && s[g] === a[y]; )
-      r.unshift(a[y]), g -= 1, y -= 1;
-    const L = e.join(U), o = r.join(U), f = s.slice(h, g + 1).join(U), v = a.slice(h, y + 1).join(U);
-    return L.length && o.length ? L + U + "{" + f + " → " + v + "}" + U + o : L.length ? L + U + "{" + f + " → " + v + "}" : o.length ? "{" + f + " → " + v + "}" + U + o : t + " → " + n;
-  } else return be(n) ? t : n;
+function K(e, t, n = !0) {
+	let r = ge(t);
+	return {
+		prefix: e.substring(0, r),
+		content: n ? G(e.substring(r)) : e.substring(r)
+	};
 }
-function Ie(i) {
-  return `d2h-${st(he(i)).toString().slice(-6)}`;
+function q(e) {
+	let t = _(e.oldName), n = _(e.newName);
+	if (t !== n && !H(t) && !H(n)) {
+		let e = [], r = [], i = t.split(V), a = n.split(V), o = i.length, s = a.length, c = 0, l = o - 1, u = s - 1;
+		for (; c < l && c < u && i[c] === a[c];) e.push(a[c]), c += 1;
+		for (; l > c && u > c && i[l] === a[u];) r.unshift(a[u]), --l, --u;
+		let d = e.join(V), f = r.join(V), p = i.slice(c, l + 1).join(V), m = a.slice(c, u + 1).join(V);
+		return d.length && f.length ? d + V + "{" + p + " → " + m + "}/" + f : d.length ? d + V + "{" + p + " → " + m + "}" : f.length ? "{" + p + " → " + m + "}/" + f : t + " → " + n;
+	} else if (H(n)) return t;
+	else return n;
 }
-function De(i) {
-  let t = "file-changed";
-  return i.isRename || i.isCopy ? t = "file-renamed" : i.isNew ? t = "file-added" : i.isDeleted ? t = "file-deleted" : i.newName !== i.oldName && (t = "file-renamed"), t;
+function J(e) {
+	return `d2h-${v(q(e)).toString().slice(-6)}`;
 }
-function Ye(i, t, n, e = {}) {
-  const { matching: r, maxLineLengthHighlight: s, matchWordsThreshold: a, diffStyle: u } = Object.assign(Object.assign({}, de), e), c = _(i, n, !1), h = _(t, n, !1);
-  if (c.content.length > s || h.content.length > s)
-    return {
-      oldLine: {
-        prefix: c.prefix,
-        content: te(c.content)
-      },
-      newLine: {
-        prefix: h.prefix,
-        content: te(h.content)
-      }
-    };
-  const g = u === "char" ? ft(c.content, h.content) : dt(c.content, h.content), y = [];
-  if (u === "word" && r === "words") {
-    const o = g.filter((p) => p.removed), f = g.filter((p) => p.added);
-    bt(f, o).forEach((p) => {
-      p[0].length === 1 && p[1].length === 1 && Je(p[0][0], p[1][0]) < a && (y.push(p[0][0]), y.push(p[1][0]));
-    });
-  }
-  const L = g.reduce((o, f) => {
-    const v = f.added ? "ins" : f.removed ? "del" : null, p = y.indexOf(f) > -1 ? ' class="d2h-change"' : "", T = te(f.value);
-    return v !== null ? `${o}<${v}${p}>${T}</${v}>` : `${o}${T}`;
-  }, "");
-  return {
-    oldLine: {
-      prefix: c.prefix,
-      content: gt(L)
-    },
-    newLine: {
-      prefix: h.prefix,
-      content: vt(L)
-    }
-  };
+function Y(e) {
+	let t = "file-changed";
+	return e.isRename || e.isCopy ? t = "file-renamed" : e.isNew ? t = "file-added" : e.isDeleted ? t = "file-deleted" : e.newName !== e.oldName && (t = "file-renamed"), t;
 }
-const We = "file-summary", yt = "icon", Tt = {
-  colorScheme: de.colorScheme
-};
-class Nt {
-  constructor(t, n = {}) {
-    this.hoganUtils = t, this.config = Object.assign(Object.assign({}, Tt), n);
-  }
-  render(t) {
-    const n = t.map((e) => this.hoganUtils.render(We, "line", {
-      fileHtmlId: Ie(e),
-      oldName: e.oldName,
-      newName: e.newName,
-      fileName: he(e),
-      deletedLines: "-" + e.deletedLines,
-      addedLines: "+" + e.addedLines
-    }, {
-      fileIcon: this.hoganUtils.template(yt, De(e))
-    })).join(`
-`);
-    return this.hoganUtils.render(We, "wrapper", {
-      colorScheme: Oe(this.config.colorScheme),
-      filesNumber: t.length,
-      files: n
-    });
-  }
+function _e(e, t, n, r = {}) {
+	let { matching: i, maxLineLengthHighlight: a, matchWordsThreshold: o, diffStyle: s } = Object.assign(Object.assign({}, B), r), c = K(e, n, !1), l = K(t, n, !1);
+	if (c.content.length > a || l.content.length > a) return {
+		oldLine: {
+			prefix: c.prefix,
+			content: G(c.content)
+		},
+		newLine: {
+			prefix: l.prefix,
+			content: G(l.content)
+		}
+	};
+	let u = s === "char" ? ie(c.content, l.content) : ce(c.content, l.content), d = [];
+	if (s === "word" && i === "words") {
+		let e = u.filter((e) => e.removed);
+		pe(u.filter((e) => e.added), e).forEach((e) => {
+			e[0].length === 1 && e[1].length === 1 && fe(e[0][0], e[1][0]) < o && (d.push(e[0][0]), d.push(e[1][0]));
+		});
+	}
+	let f = u.reduce((e, t) => {
+		let n = t.added ? "ins" : t.removed ? "del" : null, r = d.indexOf(t) > -1 ? " class=\"d2h-change\"" : "", i = G(t.value);
+		return n === null ? `${e}${i}` : `${e}<${n}${r}>${i}</${n}>`;
+	}, "");
+	return {
+		oldLine: {
+			prefix: c.prefix,
+			content: me(f)
+		},
+		newLine: {
+			prefix: l.prefix,
+			content: he(f)
+		}
+	};
 }
-const Qe = Object.assign(Object.assign({}, de), { renderNothingWhenEmpty: !1, matchingMaxComparisons: 2500, maxLineSizeInBlockForComparison: 200 }), se = "generic", je = "line-by-line", Ct = "icon", xt = "tag";
-class Et {
-  constructor(t, n = {}) {
-    this.hoganUtils = t, this.config = Object.assign(Object.assign({}, Qe), n);
-  }
-  render(t) {
-    const n = t.map((e) => {
-      let r;
-      return e.blocks.length ? r = this.generateFileHtml(e) : r = this.generateEmptyDiff(), this.makeFileDiffHtml(e, r);
-    }).join(`
-`);
-    return this.hoganUtils.render(se, "wrapper", {
-      colorScheme: Oe(this.config.colorScheme),
-      content: n
-    });
-  }
-  makeFileDiffHtml(t, n) {
-    if (this.config.renderNothingWhenEmpty && Array.isArray(t.blocks) && t.blocks.length === 0)
-      return "";
-    const e = this.hoganUtils.template(je, "file-diff"), r = this.hoganUtils.template(se, "file-path"), s = this.hoganUtils.template(Ct, "file"), a = this.hoganUtils.template(xt, De(t));
-    return e.render({
-      file: t,
-      fileHtmlId: Ie(t),
-      diffs: n,
-      filePath: r.render({
-        fileDiffName: he(t)
-      }, {
-        fileIcon: s,
-        fileTag: a
-      })
-    });
-  }
-  generateEmptyDiff() {
-    return this.hoganUtils.render(se, "empty-diff", {
-      contentClass: "d2h-code-line",
-      CSSLineClass: R
-    });
-  }
-  generateFileHtml(t) {
-    const n = Se(Le((e) => _(e.content, t.isCombined).content));
-    return t.blocks.map((e) => {
-      let r = this.hoganUtils.render(se, "block-header", {
-        CSSLineClass: R,
-        blockHeader: t.isTooBig ? e.header : te(e.header),
-        lineClass: "d2h-code-linenumber",
-        contentClass: "d2h-code-line"
-      });
-      return this.applyLineGroupping(e).forEach(([s, a, u]) => {
-        if (a.length && u.length && !s.length)
-          this.applyRematchMatching(a, u, n).map(([c, h]) => {
-            const { left: g, right: y } = this.processChangedLines(t, t.isCombined, c, h);
-            r += g, r += y;
-          });
-        else if (s.length)
-          s.forEach((c) => {
-            const { prefix: h, content: g } = _(c.content, t.isCombined);
-            r += this.generateSingleLineHtml(t, {
-              type: R.CONTEXT,
-              prefix: h,
-              content: g,
-              oldNumber: c.oldNumber,
-              newNumber: c.newNumber
-            });
-          });
-        else if (a.length || u.length) {
-          const { left: c, right: h } = this.processChangedLines(t, t.isCombined, a, u);
-          r += c, r += h;
-        } else
-          console.error("Unknown state reached while processing groups of lines", s, a, u);
-      }), r;
-    }).join(`
-`);
-  }
-  applyLineGroupping(t) {
-    const n = [];
-    let e = [], r = [];
-    for (let s = 0; s < t.lines.length; s++) {
-      const a = t.lines[s];
-      (a.type !== H.INSERT && r.length || a.type === H.CONTEXT && e.length > 0) && (n.push([[], e, r]), e = [], r = []), a.type === H.CONTEXT ? n.push([[a], [], []]) : a.type === H.INSERT && e.length === 0 ? n.push([[], [], [a]]) : a.type === H.INSERT && e.length > 0 ? r.push(a) : a.type === H.DELETE && e.push(a);
-    }
-    return (e.length || r.length) && (n.push([[], e, r]), e = [], r = []), n;
-  }
-  applyRematchMatching(t, n, e) {
-    const r = t.length * n.length, s = Ve(t.concat(n).map((u) => u.content.length));
-    return r < this.config.matchingMaxComparisons && s < this.config.maxLineSizeInBlockForComparison && (this.config.matching === "lines" || this.config.matching === "words") ? e(t, n) : [[t, n]];
-  }
-  processChangedLines(t, n, e, r) {
-    const s = {
-      right: "",
-      left: ""
-    }, a = Math.max(e.length, r.length);
-    for (let u = 0; u < a; u++) {
-      const c = e[u], h = r[u], g = c !== void 0 && h !== void 0 ? Ye(c.content, h.content, n, this.config) : void 0, y = c !== void 0 && c.oldNumber !== void 0 ? Object.assign(Object.assign({}, g !== void 0 ? {
-        prefix: g.oldLine.prefix,
-        content: g.oldLine.content,
-        type: R.DELETE_CHANGES
-      } : Object.assign(Object.assign({}, _(c.content, n)), { type: ce(c.type) })), { oldNumber: c.oldNumber, newNumber: c.newNumber }) : void 0, L = h !== void 0 && h.newNumber !== void 0 ? Object.assign(Object.assign({}, g !== void 0 ? {
-        prefix: g.newLine.prefix,
-        content: g.newLine.content,
-        type: R.INSERT_CHANGES
-      } : Object.assign(Object.assign({}, _(h.content, n)), { type: ce(h.type) })), { oldNumber: h.oldNumber, newNumber: h.newNumber }) : void 0, { left: o, right: f } = this.generateLineHtml(t, y, L);
-      s.left += o, s.right += f;
-    }
-    return s;
-  }
-  generateLineHtml(t, n, e) {
-    return {
-      left: this.generateSingleLineHtml(t, n),
-      right: this.generateSingleLineHtml(t, e)
-    };
-  }
-  generateSingleLineHtml(t, n) {
-    if (n === void 0)
-      return "";
-    const e = this.hoganUtils.render(je, "numbers", {
-      oldNumber: n.oldNumber || "",
-      newNumber: n.newNumber || ""
-    });
-    return this.hoganUtils.render(se, "line", {
-      type: n.type,
-      lineClass: "d2h-code-linenumber",
-      contentClass: "d2h-code-line",
-      prefix: n.prefix === " " ? "&nbsp;" : n.prefix,
-      content: n.content,
-      lineNumber: e,
-      line: n,
-      file: t
-    });
-  }
+//#endregion
+//#region node_modules/diff2html/lib-esm/file-list-renderer.js
+var ve = "file-summary", ye = "icon", be = { colorScheme: B.colorScheme }, xe = class {
+	constructor(e, t = {}) {
+		this.hoganUtils = e, this.config = Object.assign(Object.assign({}, be), t);
+	}
+	render(e) {
+		let t = e.map((e) => this.hoganUtils.render(ve, "line", {
+			fileHtmlId: J(e),
+			oldName: e.oldName,
+			newName: e.newName,
+			fileName: q(e),
+			deletedLines: "-" + e.deletedLines,
+			addedLines: "+" + e.addedLines
+		}, { fileIcon: this.hoganUtils.template(ye, Y(e)) })).join("\n");
+		return this.hoganUtils.render(ve, "wrapper", {
+			colorScheme: W(this.config.colorScheme),
+			filesNumber: e.length,
+			files: t
+		});
+	}
+}, Se = Object.assign(Object.assign({}, B), {
+	renderNothingWhenEmpty: !1,
+	matchingMaxComparisons: 2500,
+	maxLineSizeInBlockForComparison: 200
+}), X = "generic", Ce = "line-by-line", we = "icon", Te = "tag", Ee = class {
+	constructor(e, t = {}) {
+		this.hoganUtils = e, this.config = Object.assign(Object.assign({}, Se), t);
+	}
+	render(e) {
+		let t = e.map((e) => {
+			let t;
+			return t = e.blocks.length ? this.generateFileHtml(e) : this.generateEmptyDiff(), this.makeFileDiffHtml(e, t);
+		}).join("\n");
+		return this.hoganUtils.render(X, "wrapper", {
+			colorScheme: W(this.config.colorScheme),
+			content: t
+		});
+	}
+	makeFileDiffHtml(e, t) {
+		if (this.config.renderNothingWhenEmpty && Array.isArray(e.blocks) && e.blocks.length === 0) return "";
+		let n = this.hoganUtils.template(Ce, "file-diff"), r = this.hoganUtils.template(X, "file-path"), i = this.hoganUtils.template(we, "file"), a = this.hoganUtils.template(Te, Y(e));
+		return n.render({
+			file: e,
+			fileHtmlId: J(e),
+			diffs: t,
+			filePath: r.render({ fileDiffName: q(e) }, {
+				fileIcon: i,
+				fileTag: a
+			})
+		});
+	}
+	generateEmptyDiff() {
+		return this.hoganUtils.render(X, "empty-diff", {
+			contentClass: "d2h-code-line",
+			CSSLineClass: z
+		});
+	}
+	generateFileHtml(e) {
+		let t = R(L((t) => K(t.content, e.isCombined).content));
+		return e.blocks.map((n) => {
+			let r = this.hoganUtils.render(X, "block-header", {
+				CSSLineClass: z,
+				blockHeader: e.isTooBig ? n.header : G(n.header),
+				lineClass: "d2h-code-linenumber",
+				contentClass: "d2h-code-line"
+			});
+			return this.applyLineGroupping(n).forEach(([n, i, a]) => {
+				if (i.length && a.length && !n.length) this.applyRematchMatching(i, a, t).map(([t, n]) => {
+					let { left: i, right: a } = this.processChangedLines(e, e.isCombined, t, n);
+					r += i, r += a;
+				});
+				else if (n.length) n.forEach((t) => {
+					let { prefix: n, content: i } = K(t.content, e.isCombined);
+					r += this.generateSingleLineHtml(e, {
+						type: z.CONTEXT,
+						prefix: n,
+						content: i,
+						oldNumber: t.oldNumber,
+						newNumber: t.newNumber
+					});
+				});
+				else if (i.length || a.length) {
+					let { left: t, right: n } = this.processChangedLines(e, e.isCombined, i, a);
+					r += t, r += n;
+				} else console.error("Unknown state reached while processing groups of lines", n, i, a);
+			}), r;
+		}).join("\n");
+	}
+	applyLineGroupping(e) {
+		let t = [], n = [], r = [];
+		for (let i = 0; i < e.lines.length; i++) {
+			let a = e.lines[i];
+			(a.type !== u.INSERT && r.length || a.type === u.CONTEXT && n.length > 0) && (t.push([
+				[],
+				n,
+				r
+			]), n = [], r = []), a.type === u.CONTEXT ? t.push([
+				[a],
+				[],
+				[]
+			]) : a.type === u.INSERT && n.length === 0 ? t.push([
+				[],
+				[],
+				[a]
+			]) : a.type === u.INSERT && n.length > 0 ? r.push(a) : a.type === u.DELETE && n.push(a);
+		}
+		return (n.length || r.length) && (t.push([
+			[],
+			n,
+			r
+		]), n = [], r = []), t;
+	}
+	applyRematchMatching(e, t, n) {
+		let r = e.length * t.length, i = y(e.concat(t).map((e) => e.content.length));
+		return r < this.config.matchingMaxComparisons && i < this.config.maxLineSizeInBlockForComparison && (this.config.matching === "lines" || this.config.matching === "words") ? n(e, t) : [[e, t]];
+	}
+	processChangedLines(e, t, n, r) {
+		let i = {
+			right: "",
+			left: ""
+		}, a = Math.max(n.length, r.length);
+		for (let o = 0; o < a; o++) {
+			let a = n[o], s = r[o], c = a !== void 0 && s !== void 0 ? _e(a.content, s.content, t, this.config) : void 0, l = a !== void 0 && a.oldNumber !== void 0 ? Object.assign(Object.assign({}, c === void 0 ? Object.assign(Object.assign({}, K(a.content, t)), { type: U(a.type) }) : {
+				prefix: c.oldLine.prefix,
+				content: c.oldLine.content,
+				type: z.DELETE_CHANGES
+			}), {
+				oldNumber: a.oldNumber,
+				newNumber: a.newNumber
+			}) : void 0, u = s !== void 0 && s.newNumber !== void 0 ? Object.assign(Object.assign({}, c === void 0 ? Object.assign(Object.assign({}, K(s.content, t)), { type: U(s.type) }) : {
+				prefix: c.newLine.prefix,
+				content: c.newLine.content,
+				type: z.INSERT_CHANGES
+			}), {
+				oldNumber: s.oldNumber,
+				newNumber: s.newNumber
+			}) : void 0, { left: d, right: f } = this.generateLineHtml(e, l, u);
+			i.left += d, i.right += f;
+		}
+		return i;
+	}
+	generateLineHtml(e, t, n) {
+		return {
+			left: this.generateSingleLineHtml(e, t),
+			right: this.generateSingleLineHtml(e, n)
+		};
+	}
+	generateSingleLineHtml(e, t) {
+		if (t === void 0) return "";
+		let n = this.hoganUtils.render(Ce, "numbers", {
+			oldNumber: t.oldNumber || "",
+			newNumber: t.newNumber || ""
+		});
+		return this.hoganUtils.render(X, "line", {
+			type: t.type,
+			lineClass: "d2h-code-linenumber",
+			contentClass: "d2h-code-line",
+			prefix: t.prefix === " " ? "&nbsp;" : t.prefix,
+			content: t.content,
+			lineNumber: n,
+			line: t,
+			file: e
+		});
+	}
+}, De = Object.assign(Object.assign({}, B), {
+	renderNothingWhenEmpty: !1,
+	matchingMaxComparisons: 2500,
+	maxLineSizeInBlockForComparison: 200
+}), Z = "generic", Oe = "side-by-side", ke = "icon", Ae = "tag", je = class {
+	constructor(e, t = {}) {
+		this.hoganUtils = e, this.config = Object.assign(Object.assign({}, De), t);
+	}
+	render(e) {
+		let t = e.map((e) => {
+			let t;
+			return t = e.blocks.length ? this.generateFileHtml(e) : this.generateEmptyDiff(), this.makeFileDiffHtml(e, t);
+		}).join("\n");
+		return this.hoganUtils.render(Z, "wrapper", {
+			colorScheme: W(this.config.colorScheme),
+			content: t
+		});
+	}
+	makeFileDiffHtml(e, t) {
+		if (this.config.renderNothingWhenEmpty && Array.isArray(e.blocks) && e.blocks.length === 0) return "";
+		let n = this.hoganUtils.template(Oe, "file-diff"), r = this.hoganUtils.template(Z, "file-path"), i = this.hoganUtils.template(ke, "file"), a = this.hoganUtils.template(Ae, Y(e));
+		return n.render({
+			file: e,
+			fileHtmlId: J(e),
+			diffs: t,
+			filePath: r.render({ fileDiffName: q(e) }, {
+				fileIcon: i,
+				fileTag: a
+			})
+		});
+	}
+	generateEmptyDiff() {
+		return {
+			right: "",
+			left: this.hoganUtils.render(Z, "empty-diff", {
+				contentClass: "d2h-code-side-line",
+				CSSLineClass: z
+			})
+		};
+	}
+	generateFileHtml(e) {
+		let t = R(L((t) => K(t.content, e.isCombined).content));
+		return e.blocks.map((n) => {
+			let r = {
+				left: this.makeHeaderHtml(n.header, e),
+				right: this.makeHeaderHtml("")
+			};
+			return this.applyLineGroupping(n).forEach(([n, i, a]) => {
+				if (i.length && a.length && !n.length) this.applyRematchMatching(i, a, t).map(([t, n]) => {
+					let { left: i, right: a } = this.processChangedLines(e.isCombined, t, n);
+					r.left += i, r.right += a;
+				});
+				else if (n.length) n.forEach((t) => {
+					let { prefix: n, content: i } = K(t.content, e.isCombined), { left: a, right: o } = this.generateLineHtml({
+						type: z.CONTEXT,
+						prefix: n,
+						content: i,
+						number: t.oldNumber
+					}, {
+						type: z.CONTEXT,
+						prefix: n,
+						content: i,
+						number: t.newNumber
+					});
+					r.left += a, r.right += o;
+				});
+				else if (i.length || a.length) {
+					let { left: t, right: n } = this.processChangedLines(e.isCombined, i, a);
+					r.left += t, r.right += n;
+				} else console.error("Unknown state reached while processing groups of lines", n, i, a);
+			}), r;
+		}).reduce((e, t) => ({
+			left: e.left + t.left,
+			right: e.right + t.right
+		}), {
+			left: "",
+			right: ""
+		});
+	}
+	applyLineGroupping(e) {
+		let t = [], n = [], r = [];
+		for (let i = 0; i < e.lines.length; i++) {
+			let a = e.lines[i];
+			(a.type !== u.INSERT && r.length || a.type === u.CONTEXT && n.length > 0) && (t.push([
+				[],
+				n,
+				r
+			]), n = [], r = []), a.type === u.CONTEXT ? t.push([
+				[a],
+				[],
+				[]
+			]) : a.type === u.INSERT && n.length === 0 ? t.push([
+				[],
+				[],
+				[a]
+			]) : a.type === u.INSERT && n.length > 0 ? r.push(a) : a.type === u.DELETE && n.push(a);
+		}
+		return (n.length || r.length) && (t.push([
+			[],
+			n,
+			r
+		]), n = [], r = []), t;
+	}
+	applyRematchMatching(e, t, n) {
+		let r = e.length * t.length, i = y(e.concat(t).map((e) => e.content.length));
+		return r < this.config.matchingMaxComparisons && i < this.config.maxLineSizeInBlockForComparison && (this.config.matching === "lines" || this.config.matching === "words") ? n(e, t) : [[e, t]];
+	}
+	makeHeaderHtml(e, t) {
+		return this.hoganUtils.render(Z, "block-header", {
+			CSSLineClass: z,
+			blockHeader: t?.isTooBig ? e : G(e),
+			lineClass: "d2h-code-side-linenumber",
+			contentClass: "d2h-code-side-line"
+		});
+	}
+	processChangedLines(e, t, n) {
+		let r = {
+			right: "",
+			left: ""
+		}, i = Math.max(t.length, n.length);
+		for (let a = 0; a < i; a++) {
+			let i = t[a], o = n[a], s = i !== void 0 && o !== void 0 ? _e(i.content, o.content, e, this.config) : void 0, c = i !== void 0 && i.oldNumber !== void 0 ? Object.assign(Object.assign({}, s === void 0 ? Object.assign(Object.assign({}, K(i.content, e)), { type: U(i.type) }) : {
+				prefix: s.oldLine.prefix,
+				content: s.oldLine.content,
+				type: z.DELETE_CHANGES
+			}), { number: i.oldNumber }) : void 0, l = o !== void 0 && o.newNumber !== void 0 ? Object.assign(Object.assign({}, s === void 0 ? Object.assign(Object.assign({}, K(o.content, e)), { type: U(o.type) }) : {
+				prefix: s.newLine.prefix,
+				content: s.newLine.content,
+				type: z.INSERT_CHANGES
+			}), { number: o.newNumber }) : void 0, { left: u, right: d } = this.generateLineHtml(c, l);
+			r.left += u, r.right += d;
+		}
+		return r;
+	}
+	generateLineHtml(e, t) {
+		return {
+			left: this.generateSingleHtml(e),
+			right: this.generateSingleHtml(t)
+		};
+	}
+	generateSingleHtml(e) {
+		let t = "d2h-code-side-linenumber", n = "d2h-code-side-line";
+		return this.hoganUtils.render(Z, "line", {
+			type: e?.type || `${z.CONTEXT} d2h-emptyplaceholder`,
+			lineClass: e === void 0 ? `${t} d2h-code-side-emptyplaceholder` : t,
+			contentClass: e === void 0 ? `${n} d2h-code-side-emptyplaceholder` : n,
+			prefix: e?.prefix === " " ? "&nbsp;" : e?.prefix,
+			content: e?.content,
+			lineNumber: e?.number
+		});
+	}
+}, Me = /* @__PURE__ */ o(((e) => {
+	(function(e) {
+		var t = /\S/, n = /\"/g, r = /\n/g, i = /\r/g, a = /\\/g, o = /\u2028/, s = /\u2029/;
+		e.tags = {
+			"#": 1,
+			"^": 2,
+			"<": 3,
+			$: 4,
+			"/": 5,
+			"!": 6,
+			">": 7,
+			"=": 8,
+			_v: 9,
+			"{": 10,
+			"&": 11,
+			_t: 12
+		}, e.scan = function(n, r) {
+			var i = n.length, a = 0, o = 1, s = 2, d = a, f = null, p = null, m = "", h = [], g = !1, _ = 0, v = 0, y = "{{", b = "}}";
+			function x() {
+				m.length > 0 && (h.push({
+					tag: "_t",
+					text: new String(m)
+				}), m = "");
+			}
+			function S() {
+				for (var n = !0, r = v; r < h.length; r++) if (n = e.tags[h[r].tag] < e.tags._v || h[r].tag == "_t" && h[r].text.match(t) === null, !n) return !1;
+				return n;
+			}
+			function C(e, t) {
+				if (x(), e && S()) for (var n = v, r; n < h.length; n++) h[n].text && ((r = h[n + 1]) && r.tag == ">" && (r.indent = h[n].text.toString()), h.splice(n, 1));
+				else t || h.push({ tag: "\n" });
+				g = !1, v = h.length;
+			}
+			function ee(e, t) {
+				var n = "=" + b, r = e.indexOf(n, t), i = l(e.substring(e.indexOf("=", t) + 1, r)).split(" ");
+				return y = i[0], b = i[i.length - 1], r + n.length - 1;
+			}
+			for (r && (r = r.split(" "), y = r[0], b = r[1]), _ = 0; _ < i; _++) d == a ? u(y, n, _) ? (--_, x(), d = o) : n.charAt(_) == "\n" ? C(g) : m += n.charAt(_) : d == o ? (_ += y.length - 1, p = e.tags[n.charAt(_ + 1)], f = p ? n.charAt(_ + 1) : "_v", f == "=" ? (_ = ee(n, _), d = a) : (p && _++, d = s), g = _) : u(b, n, _) ? (h.push({
+				tag: f,
+				n: l(m),
+				otag: y,
+				ctag: b,
+				i: f == "/" ? g - y.length : _ + b.length
+			}), m = "", _ += b.length - 1, d = a, f == "{" && (b == "}}" ? _++ : c(h[h.length - 1]))) : m += n.charAt(_);
+			return C(g, !0), h;
+		};
+		function c(e) {
+			e.n.substr(e.n.length - 1) === "}" && (e.n = e.n.substring(0, e.n.length - 1));
+		}
+		function l(e) {
+			return e.trim ? e.trim() : e.replace(/^\s*|\s*$/g, "");
+		}
+		function u(e, t, n) {
+			if (t.charAt(n) != e.charAt(0)) return !1;
+			for (var r = 1, i = e.length; r < i; r++) if (t.charAt(n + r) != e.charAt(r)) return !1;
+			return !0;
+		}
+		var d = {
+			_t: !0,
+			"\n": !0,
+			$: !0,
+			"/": !0
+		};
+		function f(t, n, r, i) {
+			var a = [], o = null, s = null, c = null;
+			for (s = r[r.length - 1]; t.length > 0;) {
+				if (c = t.shift(), s && s.tag == "<" && !(c.tag in d)) throw Error("Illegal content in < super tag.");
+				if (e.tags[c.tag] <= e.tags.$ || p(c, i)) r.push(c), c.nodes = f(t, c.tag, r, i);
+				else if (c.tag == "/") {
+					if (r.length === 0) throw Error("Closing tag without opener: /" + c.n);
+					if (o = r.pop(), c.n != o.n && !m(c.n, o.n, i)) throw Error("Nesting error: " + o.n + " vs. " + c.n);
+					return o.end = c.i, a;
+				} else c.tag == "\n" && (c.last = t.length == 0 || t[0].tag == "\n");
+				a.push(c);
+			}
+			if (r.length > 0) throw Error("missing closing tag: " + r.pop().n);
+			return a;
+		}
+		function p(e, t) {
+			for (var n = 0, r = t.length; n < r; n++) if (t[n].o == e.n) return e.tag = "#", !0;
+		}
+		function m(e, t, n) {
+			for (var r = 0, i = n.length; r < i; r++) if (n[r].c == e && n[r].o == t) return !0;
+		}
+		function h(e) {
+			var t = [];
+			for (var n in e) t.push("\"" + v(n) + "\": function(c,p,t,i) {" + e[n] + "}");
+			return "{ " + t.join(",") + " }";
+		}
+		function g(e) {
+			var t = [];
+			for (var n in e.partials) t.push("\"" + v(n) + "\":{name:\"" + v(e.partials[n].name) + "\", " + g(e.partials[n]) + "}");
+			return "partials: {" + t.join(",") + "}, subs: " + h(e.subs);
+		}
+		e.stringify = function(t, n, r) {
+			return "{code: function (c,p,i) { " + e.wrapMain(t.code) + " }," + g(t) + "}";
+		};
+		var _ = 0;
+		e.generate = function(t, n, r) {
+			_ = 0;
+			var i = {
+				code: "",
+				subs: {},
+				partials: {}
+			};
+			return e.walk(t, i), r.asString ? this.stringify(i, n, r) : this.makeTemplate(i, n, r);
+		}, e.wrapMain = function(e) {
+			return "var t=this;t.b(i=i||\"\");" + e + "return t.fl();";
+		}, e.template = e.Template, e.makeTemplate = function(e, t, n) {
+			var r = this.makePartials(e);
+			return r.code = Function("c", "p", "i", this.wrapMain(e.code)), new this.template(r, t, this, n);
+		}, e.makePartials = function(e) {
+			var t, n = {
+				subs: {},
+				partials: e.partials,
+				name: e.name
+			};
+			for (t in n.partials) n.partials[t] = this.makePartials(n.partials[t]);
+			for (t in e.subs) n.subs[t] = Function("c", "p", "t", "i", e.subs[t]);
+			return n;
+		};
+		function v(e) {
+			return e.replace(a, "\\\\").replace(n, "\\\"").replace(r, "\\n").replace(i, "\\r").replace(o, "\\u2028").replace(s, "\\u2029");
+		}
+		function y(e) {
+			return ~e.indexOf(".") ? "d" : "f";
+		}
+		function b(e, t) {
+			var n = "<" + (t.prefix || "") + e.n + _++;
+			return t.partials[n] = {
+				name: e.n,
+				partials: {}
+			}, t.code += "t.b(t.rp(\"" + v(n) + "\",c,p,\"" + (e.indent || "") + "\"));", n;
+		}
+		e.codegen = {
+			"#": function(t, n) {
+				n.code += "if(t.s(t." + y(t.n) + "(\"" + v(t.n) + "\",c,p,1),c,p,0," + t.i + "," + t.end + ",\"" + t.otag + " " + t.ctag + "\")){t.rs(c,p,function(c,p,t){", e.walk(t.nodes, n), n.code += "});c.pop();}";
+			},
+			"^": function(t, n) {
+				n.code += "if(!t.s(t." + y(t.n) + "(\"" + v(t.n) + "\",c,p,1),c,p,1,0,0,\"\")){", e.walk(t.nodes, n), n.code += "};";
+			},
+			">": b,
+			"<": function(t, n) {
+				var r = {
+					partials: {},
+					code: "",
+					subs: {},
+					inPartial: !0
+				};
+				e.walk(t.nodes, r);
+				var i = n.partials[b(t, n)];
+				i.subs = r.subs, i.partials = r.partials;
+			},
+			$: function(t, n) {
+				var r = {
+					subs: {},
+					code: "",
+					partials: n.partials,
+					prefix: t.n
+				};
+				e.walk(t.nodes, r), n.subs[t.n] = r.code, n.inPartial || (n.code += "t.sub(\"" + v(t.n) + "\",c,p,i);");
+			},
+			"\n": function(e, t) {
+				t.code += S("\"\\n\"" + (e.last ? "" : " + i"));
+			},
+			_v: function(e, t) {
+				t.code += "t.b(t.v(t." + y(e.n) + "(\"" + v(e.n) + "\",c,p,0)));";
+			},
+			_t: function(e, t) {
+				t.code += S("\"" + v(e.text) + "\"");
+			},
+			"{": x,
+			"&": x
+		};
+		function x(e, t) {
+			t.code += "t.b(t.t(t." + y(e.n) + "(\"" + v(e.n) + "\",c,p,0)));";
+		}
+		function S(e) {
+			return "t.b(" + e + ");";
+		}
+		e.walk = function(t, n) {
+			for (var r, i = 0, a = t.length; i < a; i++) r = e.codegen[t[i].tag], r && r(t[i], n);
+			return n;
+		}, e.parse = function(e, t, n) {
+			return n ||= {}, f(e, "", [], n.sectionTags || []);
+		}, e.cache = {}, e.cacheKey = function(e, t) {
+			return [
+				e,
+				!!t.asString,
+				!!t.disableLambda,
+				t.delimiters,
+				!!t.modelGet
+			].join("||");
+		}, e.compile = function(t, n) {
+			n ||= {};
+			var r = e.cacheKey(t, n), i = this.cache[r];
+			if (i) {
+				var a = i.partials;
+				for (var o in a) delete a[o].instance;
+				return i;
+			}
+			return i = this.generate(this.parse(this.scan(t, n.delimiters), t, n), t, n), this.cache[r] = i;
+		};
+	})(e === void 0 ? Hogan : e);
+})), Ne = /* @__PURE__ */ o(((e) => {
+	(function(e) {
+		e.Template = function(e, t, n, r) {
+			e ||= {}, this.r = e.code || this.r, this.c = n, this.options = r || {}, this.text = t || "", this.partials = e.partials || {}, this.subs = e.subs || {}, this.buf = "";
+		}, e.Template.prototype = {
+			r: function(e, t, n) {
+				return "";
+			},
+			v: u,
+			t: l,
+			render: function(e, t, n) {
+				return this.ri([e], t || {}, n);
+			},
+			ri: function(e, t, n) {
+				return this.r(e, t, n);
+			},
+			ep: function(e, t) {
+				var r = this.partials[e], i = t[r.name];
+				if (r.instance && r.base == i) return r.instance;
+				if (typeof i == "string") {
+					if (!this.c) throw Error("No compiler available.");
+					i = this.c.compile(i, this.options);
+				}
+				if (!i) return null;
+				if (this.partials[e].base = i, r.subs) {
+					for (key in t.stackText ||= {}, r.subs) t.stackText[key] || (t.stackText[key] = this.activeSub !== void 0 && t.stackText[this.activeSub] ? t.stackText[this.activeSub] : this.text);
+					i = n(i, r.subs, r.partials, this.stackSubs, this.stackPartials, t.stackText);
+				}
+				return this.partials[e].instance = i, i;
+			},
+			rp: function(e, t, n, r) {
+				var i = this.ep(e, n);
+				return i ? i.ri(t, n, r) : "";
+			},
+			rs: function(e, t, n) {
+				var r = e[e.length - 1];
+				if (!d(r)) {
+					n(e, t, this);
+					return;
+				}
+				for (var i = 0; i < r.length; i++) e.push(r[i]), n(e, t, this), e.pop();
+			},
+			s: function(e, t, n, r, i, a, o) {
+				var s;
+				return d(e) && e.length === 0 ? !1 : (typeof e == "function" && (e = this.ms(e, t, n, r, i, a, o)), s = !!e, !r && s && t && t.push(typeof e == "object" ? e : t[t.length - 1]), s);
+			},
+			d: function(e, n, r, i) {
+				var a, o = e.split("."), s = this.f(o[0], n, r, i), c = this.options.modelGet, l = null;
+				if (e === "." && d(n[n.length - 2])) s = n[n.length - 1];
+				else for (var u = 1; u < o.length; u++) a = t(o[u], s, c), a === void 0 ? s = "" : (l = s, s = a);
+				return i && !s ? !1 : (!i && typeof s == "function" && (n.push(l), s = this.mv(s, n, r), n.pop()), s);
+			},
+			f: function(e, n, r, i) {
+				for (var a = !1, o = null, s = !1, c = this.options.modelGet, l = n.length - 1; l >= 0; l--) if (o = n[l], a = t(e, o, c), a !== void 0) {
+					s = !0;
+					break;
+				}
+				return s ? (!i && typeof a == "function" && (a = this.mv(a, n, r)), a) : i ? !1 : "";
+			},
+			ls: function(e, t, n, r, i, a) {
+				var o = this.options.delimiters;
+				return this.options.delimiters = a, this.b(this.ct(l(e.call(t, i, n)), t, r)), this.options.delimiters = o, !1;
+			},
+			ct: function(e, t, n) {
+				if (this.options.disableLambda) throw Error("Lambda features disabled.");
+				return this.c.compile(e, this.options).render(t, n);
+			},
+			b: function(e) {
+				this.buf += e;
+			},
+			fl: function() {
+				var e = this.buf;
+				return this.buf = "", e;
+			},
+			ms: function(e, t, n, r, i, a, o) {
+				var s, c = t[t.length - 1], l = e.call(c);
+				return typeof l == "function" ? r ? !0 : (s = this.activeSub && this.subsText && this.subsText[this.activeSub] ? this.subsText[this.activeSub] : this.text, this.ls(l, c, t, n, s.substring(i, a), o)) : l;
+			},
+			mv: function(e, t, n) {
+				var r = t[t.length - 1], i = e.call(r);
+				return typeof i == "function" ? this.ct(l(i.call(r)), r, n) : i;
+			},
+			sub: function(e, t, n, r) {
+				var i = this.subs[e];
+				i && (this.activeSub = e, i(t, n, this, r), this.activeSub = !1);
+			}
+		};
+		function t(e, t, n) {
+			var r;
+			return t && typeof t == "object" && (t[e] === void 0 ? n && t.get && typeof t.get == "function" && (r = t.get(e)) : r = t[e]), r;
+		}
+		function n(e, t, n, r, i, a) {
+			function o() {}
+			o.prototype = e;
+			function s() {}
+			s.prototype = e.subs;
+			var c, l = new o();
+			for (c in l.subs = new s(), l.subsText = {}, l.buf = "", r ||= {}, l.stackSubs = r, l.subsText = a, t) r[c] || (r[c] = t[c]);
+			for (c in r) l.subs[c] = r[c];
+			for (c in i ||= {}, l.stackPartials = i, n) i[c] || (i[c] = n[c]);
+			for (c in i) l.partials[c] = i[c];
+			return l;
+		}
+		var r = /&/g, i = /</g, a = />/g, o = /\'/g, s = /\"/g, c = /[&<>\"\']/;
+		function l(e) {
+			return String(e ?? "");
+		}
+		function u(e) {
+			return e = l(e), c.test(e) ? e.replace(r, "&amp;").replace(i, "&lt;").replace(a, "&gt;").replace(o, "&#39;").replace(s, "&quot;") : e;
+		}
+		var d = Array.isArray || function(e) {
+			return Object.prototype.toString.call(e) === "[object Array]";
+		};
+	})(e === void 0 ? {} : e);
+})), Q = /* @__PURE__ */ l((/* @__PURE__ */ o(((e, t) => {
+	var n = Me();
+	n.Template = Ne().Template, n.template = n.Template, t.exports = n;
+})))()), $ = {};
+$["file-summary-line"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<li class=\"d2h-file-list-line\">"), r.b("\n" + n), r.b("    <span class=\"d2h-file-name-wrapper\">"), r.b("\n" + n), r.b(r.rp("<fileIcon0", e, t, "      ")), r.b("      <a href=\"#"), r.b(r.v(r.f("fileHtmlId", e, t, 0))), r.b("\" class=\"d2h-file-name\">"), r.b(r.v(r.f("fileName", e, t, 0))), r.b("</a>"), r.b("\n" + n), r.b("      <span class=\"d2h-file-stats\">"), r.b("\n" + n), r.b("          <span class=\"d2h-lines-added\">"), r.b(r.v(r.f("addedLines", e, t, 0))), r.b("</span>"), r.b("\n" + n), r.b("          <span class=\"d2h-lines-deleted\">"), r.b(r.v(r.f("deletedLines", e, t, 0))), r.b("</span>"), r.b("\n" + n), r.b("      </span>"), r.b("\n" + n), r.b("    </span>"), r.b("\n" + n), r.b("</li>"), r.fl();
+	},
+	partials: { "<fileIcon0": {
+		name: "fileIcon",
+		partials: {},
+		subs: {}
+	} },
+	subs: {}
+}), $["file-summary-wrapper"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<div class=\"d2h-file-list-wrapper "), r.b(r.v(r.f("colorScheme", e, t, 0))), r.b("\">"), r.b("\n" + n), r.b("    <div class=\"d2h-file-list-header\">"), r.b("\n" + n), r.b("        <span class=\"d2h-file-list-title\">Files changed ("), r.b(r.v(r.f("filesNumber", e, t, 0))), r.b(")</span>"), r.b("\n" + n), r.b("        <a class=\"d2h-file-switch d2h-hide\">hide</a>"), r.b("\n" + n), r.b("        <a class=\"d2h-file-switch d2h-show\">show</a>"), r.b("\n" + n), r.b("    </div>"), r.b("\n" + n), r.b("    <ol class=\"d2h-file-list\">"), r.b("\n" + n), r.b("    "), r.b(r.t(r.f("files", e, t, 0))), r.b("\n" + n), r.b("    </ol>"), r.b("\n" + n), r.b("</div>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+}), $["generic-block-header"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<tr>"), r.b("\n" + n), r.b("    <td class=\""), r.b(r.v(r.f("lineClass", e, t, 0))), r.b(" "), r.b(r.v(r.d("CSSLineClass.INFO", e, t, 0))), r.b("\"></td>"), r.b("\n" + n), r.b("    <td class=\""), r.b(r.v(r.d("CSSLineClass.INFO", e, t, 0))), r.b("\">"), r.b("\n" + n), r.b("        <div class=\""), r.b(r.v(r.f("contentClass", e, t, 0))), r.b("\">"), r.s(r.f("blockHeader", e, t, 1), e, t, 0, 156, 173, "{{ }}") && (r.rs(e, t, function(e, t, n) {
+			n.b(n.t(n.f("blockHeader", e, t, 0)));
+		}), e.pop()), r.s(r.f("blockHeader", e, t, 1), e, t, 1, 0, 0, "") || r.b("&nbsp;"), r.b("</div>"), r.b("\n" + n), r.b("    </td>"), r.b("\n" + n), r.b("</tr>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+}), $["generic-empty-diff"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<tr>"), r.b("\n" + n), r.b("    <td class=\""), r.b(r.v(r.d("CSSLineClass.INFO", e, t, 0))), r.b("\">"), r.b("\n" + n), r.b("        <div class=\""), r.b(r.v(r.f("contentClass", e, t, 0))), r.b("\">"), r.b("\n" + n), r.b("            File without changes"), r.b("\n" + n), r.b("        </div>"), r.b("\n" + n), r.b("    </td>"), r.b("\n" + n), r.b("</tr>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+}), $["generic-file-path"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<span class=\"d2h-file-name-wrapper\">"), r.b("\n" + n), r.b(r.rp("<fileIcon0", e, t, "    ")), r.b("    <span class=\"d2h-file-name\">"), r.b(r.v(r.f("fileDiffName", e, t, 0))), r.b("</span>"), r.b("\n" + n), r.b(r.rp("<fileTag1", e, t, "    ")), r.b("</span>"), r.b("\n" + n), r.b("<label class=\"d2h-file-collapse\">"), r.b("\n" + n), r.b("    <input class=\"d2h-file-collapse-input\" type=\"checkbox\" name=\"viewed\" value=\"viewed\">"), r.b("\n" + n), r.b("    Viewed"), r.b("\n" + n), r.b("</label>"), r.fl();
+	},
+	partials: {
+		"<fileIcon0": {
+			name: "fileIcon",
+			partials: {},
+			subs: {}
+		},
+		"<fileTag1": {
+			name: "fileTag",
+			partials: {},
+			subs: {}
+		}
+	},
+	subs: {}
+}), $["generic-line"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<tr>"), r.b("\n" + n), r.b("    <td class=\""), r.b(r.v(r.f("lineClass", e, t, 0))), r.b(" "), r.b(r.v(r.f("type", e, t, 0))), r.b("\">"), r.b("\n" + n), r.b("      "), r.b(r.t(r.f("lineNumber", e, t, 0))), r.b("\n" + n), r.b("    </td>"), r.b("\n" + n), r.b("    <td class=\""), r.b(r.v(r.f("type", e, t, 0))), r.b("\">"), r.b("\n" + n), r.b("        <div class=\""), r.b(r.v(r.f("contentClass", e, t, 0))), r.b("\">"), r.b("\n" + n), r.s(r.f("prefix", e, t, 1), e, t, 0, 162, 238, "{{ }}") && (r.rs(e, t, function(e, t, r) {
+			r.b("            <span class=\"d2h-code-line-prefix\">"), r.b(r.t(r.f("prefix", e, t, 0))), r.b("</span>"), r.b("\n" + n);
+		}), e.pop()), r.s(r.f("prefix", e, t, 1), e, t, 1, 0, 0, "") || (r.b("            <span class=\"d2h-code-line-prefix\">&nbsp;</span>"), r.b("\n" + n)), r.s(r.f("content", e, t, 1), e, t, 0, 371, 445, "{{ }}") && (r.rs(e, t, function(e, t, r) {
+			r.b("            <span class=\"d2h-code-line-ctn\">"), r.b(r.t(r.f("content", e, t, 0))), r.b("</span>"), r.b("\n" + n);
+		}), e.pop()), r.s(r.f("content", e, t, 1), e, t, 1, 0, 0, "") || (r.b("            <span class=\"d2h-code-line-ctn\"><br></span>"), r.b("\n" + n)), r.b("        </div>"), r.b("\n" + n), r.b("    </td>"), r.b("\n" + n), r.b("</tr>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+}), $["generic-wrapper"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<div class=\"d2h-wrapper "), r.b(r.v(r.f("colorScheme", e, t, 0))), r.b("\">"), r.b("\n" + n), r.b("    "), r.b(r.t(r.f("content", e, t, 0))), r.b("\n" + n), r.b("</div>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+}), $["icon-file-added"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<svg aria-hidden=\"true\" class=\"d2h-icon d2h-added\" height=\"16\" title=\"added\" version=\"1.1\" viewBox=\"0 0 14 16\""), r.b("\n" + n), r.b("     width=\"14\">"), r.b("\n" + n), r.b("    <path d=\"M13 1H1C0.45 1 0 1.45 0 2v12c0 0.55 0.45 1 1 1h12c0.55 0 1-0.45 1-1V2c0-0.55-0.45-1-1-1z m0 13H1V2h12v12zM6 9H3V7h3V4h2v3h3v2H8v3H6V9z\"></path>"), r.b("\n" + n), r.b("</svg>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+}), $["icon-file-changed"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<svg aria-hidden=\"true\" class=\"d2h-icon d2h-changed\" height=\"16\" title=\"modified\" version=\"1.1\""), r.b("\n" + n), r.b("     viewBox=\"0 0 14 16\" width=\"14\">"), r.b("\n" + n), r.b("    <path d=\"M13 1H1C0.45 1 0 1.45 0 2v12c0 0.55 0.45 1 1 1h12c0.55 0 1-0.45 1-1V2c0-0.55-0.45-1-1-1z m0 13H1V2h12v12zM4 8c0-1.66 1.34-3 3-3s3 1.34 3 3-1.34 3-3 3-3-1.34-3-3z\"></path>"), r.b("\n" + n), r.b("</svg>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+}), $["icon-file-deleted"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<svg aria-hidden=\"true\" class=\"d2h-icon d2h-deleted\" height=\"16\" title=\"removed\" version=\"1.1\""), r.b("\n" + n), r.b("     viewBox=\"0 0 14 16\" width=\"14\">"), r.b("\n" + n), r.b("    <path d=\"M13 1H1C0.45 1 0 1.45 0 2v12c0 0.55 0.45 1 1 1h12c0.55 0 1-0.45 1-1V2c0-0.55-0.45-1-1-1z m0 13H1V2h12v12zM11 9H3V7h8v2z\"></path>"), r.b("\n" + n), r.b("</svg>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+}), $["icon-file-renamed"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<svg aria-hidden=\"true\" class=\"d2h-icon d2h-moved\" height=\"16\" title=\"renamed\" version=\"1.1\""), r.b("\n" + n), r.b("     viewBox=\"0 0 14 16\" width=\"14\">"), r.b("\n" + n), r.b("    <path d=\"M6 9H3V7h3V4l5 4-5 4V9z m8-7v12c0 0.55-0.45 1-1 1H1c-0.55 0-1-0.45-1-1V2c0-0.55 0.45-1 1-1h12c0.55 0 1 0.45 1 1z m-1 0H1v12h12V2z\"></path>"), r.b("\n" + n), r.b("</svg>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+}), $["icon-file"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<svg aria-hidden=\"true\" class=\"d2h-icon\" height=\"16\" version=\"1.1\" viewBox=\"0 0 12 16\" width=\"12\">"), r.b("\n" + n), r.b("    <path d=\"M6 5H2v-1h4v1zM2 8h7v-1H2v1z m0 2h7v-1H2v1z m0 2h7v-1H2v1z m10-7.5v9.5c0 0.55-0.45 1-1 1H1c-0.55 0-1-0.45-1-1V2c0-0.55 0.45-1 1-1h7.5l3.5 3.5z m-1 0.5L8 2H1v12h10V5z\"></path>"), r.b("\n" + n), r.b("</svg>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+}), $["line-by-line-file-diff"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<div id=\""), r.b(r.v(r.f("fileHtmlId", e, t, 0))), r.b("\" class=\"d2h-file-wrapper\" data-lang=\""), r.b(r.v(r.d("file.language", e, t, 0))), r.b("\">"), r.b("\n" + n), r.b("    <div class=\"d2h-file-header\">"), r.b("\n" + n), r.b("    "), r.b(r.t(r.f("filePath", e, t, 0))), r.b("\n" + n), r.b("    </div>"), r.b("\n" + n), r.b("    <div class=\"d2h-file-diff\">"), r.b("\n" + n), r.b("        <div class=\"d2h-code-wrapper\">"), r.b("\n" + n), r.b("            <table class=\"d2h-diff-table\">"), r.b("\n" + n), r.b("                <tbody class=\"d2h-diff-tbody\">"), r.b("\n" + n), r.b("                "), r.b(r.t(r.f("diffs", e, t, 0))), r.b("\n" + n), r.b("                </tbody>"), r.b("\n" + n), r.b("            </table>"), r.b("\n" + n), r.b("        </div>"), r.b("\n" + n), r.b("    </div>"), r.b("\n" + n), r.b("</div>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+}), $["line-by-line-numbers"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<div class=\"line-num1\">"), r.b(r.v(r.f("oldNumber", e, t, 0))), r.b("</div>"), r.b("\n" + n), r.b("<div class=\"line-num2\">"), r.b(r.v(r.f("newNumber", e, t, 0))), r.b("</div>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+}), $["side-by-side-file-diff"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<div id=\""), r.b(r.v(r.f("fileHtmlId", e, t, 0))), r.b("\" class=\"d2h-file-wrapper\" data-lang=\""), r.b(r.v(r.d("file.language", e, t, 0))), r.b("\">"), r.b("\n" + n), r.b("    <div class=\"d2h-file-header\">"), r.b("\n" + n), r.b("      "), r.b(r.t(r.f("filePath", e, t, 0))), r.b("\n" + n), r.b("    </div>"), r.b("\n" + n), r.b("    <div class=\"d2h-files-diff\">"), r.b("\n" + n), r.b("        <div class=\"d2h-file-side-diff\">"), r.b("\n" + n), r.b("            <div class=\"d2h-code-wrapper\">"), r.b("\n" + n), r.b("                <table class=\"d2h-diff-table\">"), r.b("\n" + n), r.b("                    <tbody class=\"d2h-diff-tbody\">"), r.b("\n" + n), r.b("                    "), r.b(r.t(r.d("diffs.left", e, t, 0))), r.b("\n" + n), r.b("                    </tbody>"), r.b("\n" + n), r.b("                </table>"), r.b("\n" + n), r.b("            </div>"), r.b("\n" + n), r.b("        </div>"), r.b("\n" + n), r.b("        <div class=\"d2h-file-side-diff\">"), r.b("\n" + n), r.b("            <div class=\"d2h-code-wrapper\">"), r.b("\n" + n), r.b("                <table class=\"d2h-diff-table\">"), r.b("\n" + n), r.b("                    <tbody class=\"d2h-diff-tbody\">"), r.b("\n" + n), r.b("                    "), r.b(r.t(r.d("diffs.right", e, t, 0))), r.b("\n" + n), r.b("                    </tbody>"), r.b("\n" + n), r.b("                </table>"), r.b("\n" + n), r.b("            </div>"), r.b("\n" + n), r.b("        </div>"), r.b("\n" + n), r.b("    </div>"), r.b("\n" + n), r.b("</div>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+}), $["tag-file-added"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<span class=\"d2h-tag d2h-added d2h-added-tag\">ADDED</span>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+}), $["tag-file-changed"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<span class=\"d2h-tag d2h-changed d2h-changed-tag\">CHANGED</span>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+}), $["tag-file-deleted"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<span class=\"d2h-tag d2h-deleted d2h-deleted-tag\">DELETED</span>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+}), $["tag-file-renamed"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<span class=\"d2h-tag d2h-moved d2h-moved-tag\">RENAMED</span>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+});
+//#endregion
+//#region node_modules/diff2html/lib-esm/hoganjs-utils.js
+var Pe = class {
+	constructor({ compiledTemplates: e = {}, rawTemplates: t = {} }) {
+		let n = Object.entries(t).reduce((e, [t, n]) => {
+			let r = Q.compile(n, { asString: !1 });
+			return Object.assign(Object.assign({}, e), { [t]: r });
+		}, {});
+		this.preCompiledTemplates = Object.assign(Object.assign(Object.assign({}, $), e), n);
+	}
+	static compile(e) {
+		return Q.compile(e, { asString: !1 });
+	}
+	render(e, t, n, r, i) {
+		let a = this.templateKey(e, t);
+		try {
+			return this.preCompiledTemplates[a].render(n, r, i);
+		} catch {
+			throw Error(`Could not find template to render '${a}'`);
+		}
+	}
+	template(e, t) {
+		return this.preCompiledTemplates[this.templateKey(e, t)];
+	}
+	templateKey(e, t) {
+		return `${e}-${t}`;
+	}
+}, Fe = /* @__PURE__ */ s({
+	defaultDiff2HtmlConfig: () => Ie,
+	html: () => Re,
+	parse: () => Le
+}), Ie = Object.assign(Object.assign(Object.assign({}, Se), De), {
+	outputFormat: d.LINE_BY_LINE,
+	drawFileList: !0
+});
+function Le(e, t = {}) {
+	return ne(e, Object.assign(Object.assign({}, Ie), t));
 }
-const Ze = Object.assign(Object.assign({}, de), { renderNothingWhenEmpty: !1, matchingMaxComparisons: 2500, maxLineSizeInBlockForComparison: 200 }), ae = "generic", Lt = "side-by-side", St = "icon", Ot = "tag";
-class It {
-  constructor(t, n = {}) {
-    this.hoganUtils = t, this.config = Object.assign(Object.assign({}, Ze), n);
-  }
-  render(t) {
-    const n = t.map((e) => {
-      let r;
-      return e.blocks.length ? r = this.generateFileHtml(e) : r = this.generateEmptyDiff(), this.makeFileDiffHtml(e, r);
-    }).join(`
-`);
-    return this.hoganUtils.render(ae, "wrapper", {
-      colorScheme: Oe(this.config.colorScheme),
-      content: n
-    });
-  }
-  makeFileDiffHtml(t, n) {
-    if (this.config.renderNothingWhenEmpty && Array.isArray(t.blocks) && t.blocks.length === 0)
-      return "";
-    const e = this.hoganUtils.template(Lt, "file-diff"), r = this.hoganUtils.template(ae, "file-path"), s = this.hoganUtils.template(St, "file"), a = this.hoganUtils.template(Ot, De(t));
-    return e.render({
-      file: t,
-      fileHtmlId: Ie(t),
-      diffs: n,
-      filePath: r.render({
-        fileDiffName: he(t)
-      }, {
-        fileIcon: s,
-        fileTag: a
-      })
-    });
-  }
-  generateEmptyDiff() {
-    return {
-      right: "",
-      left: this.hoganUtils.render(ae, "empty-diff", {
-        contentClass: "d2h-code-side-line",
-        CSSLineClass: R
-      })
-    };
-  }
-  generateFileHtml(t) {
-    const n = Se(Le((e) => _(e.content, t.isCombined).content));
-    return t.blocks.map((e) => {
-      const r = {
-        left: this.makeHeaderHtml(e.header, t),
-        right: this.makeHeaderHtml("")
-      };
-      return this.applyLineGroupping(e).forEach(([s, a, u]) => {
-        if (a.length && u.length && !s.length)
-          this.applyRematchMatching(a, u, n).map(([c, h]) => {
-            const { left: g, right: y } = this.processChangedLines(t.isCombined, c, h);
-            r.left += g, r.right += y;
-          });
-        else if (s.length)
-          s.forEach((c) => {
-            const { prefix: h, content: g } = _(c.content, t.isCombined), { left: y, right: L } = this.generateLineHtml({
-              type: R.CONTEXT,
-              prefix: h,
-              content: g,
-              number: c.oldNumber
-            }, {
-              type: R.CONTEXT,
-              prefix: h,
-              content: g,
-              number: c.newNumber
-            });
-            r.left += y, r.right += L;
-          });
-        else if (a.length || u.length) {
-          const { left: c, right: h } = this.processChangedLines(t.isCombined, a, u);
-          r.left += c, r.right += h;
-        } else
-          console.error("Unknown state reached while processing groups of lines", s, a, u);
-      }), r;
-    }).reduce((e, r) => ({ left: e.left + r.left, right: e.right + r.right }), { left: "", right: "" });
-  }
-  applyLineGroupping(t) {
-    const n = [];
-    let e = [], r = [];
-    for (let s = 0; s < t.lines.length; s++) {
-      const a = t.lines[s];
-      (a.type !== H.INSERT && r.length || a.type === H.CONTEXT && e.length > 0) && (n.push([[], e, r]), e = [], r = []), a.type === H.CONTEXT ? n.push([[a], [], []]) : a.type === H.INSERT && e.length === 0 ? n.push([[], [], [a]]) : a.type === H.INSERT && e.length > 0 ? r.push(a) : a.type === H.DELETE && e.push(a);
-    }
-    return (e.length || r.length) && (n.push([[], e, r]), e = [], r = []), n;
-  }
-  applyRematchMatching(t, n, e) {
-    const r = t.length * n.length, s = Ve(t.concat(n).map((u) => u.content.length));
-    return r < this.config.matchingMaxComparisons && s < this.config.maxLineSizeInBlockForComparison && (this.config.matching === "lines" || this.config.matching === "words") ? e(t, n) : [[t, n]];
-  }
-  makeHeaderHtml(t, n) {
-    return this.hoganUtils.render(ae, "block-header", {
-      CSSLineClass: R,
-      blockHeader: n?.isTooBig ? t : te(t),
-      lineClass: "d2h-code-side-linenumber",
-      contentClass: "d2h-code-side-line"
-    });
-  }
-  processChangedLines(t, n, e) {
-    const r = {
-      right: "",
-      left: ""
-    }, s = Math.max(n.length, e.length);
-    for (let a = 0; a < s; a++) {
-      const u = n[a], c = e[a], h = u !== void 0 && c !== void 0 ? Ye(u.content, c.content, t, this.config) : void 0, g = u !== void 0 && u.oldNumber !== void 0 ? Object.assign(Object.assign({}, h !== void 0 ? {
-        prefix: h.oldLine.prefix,
-        content: h.oldLine.content,
-        type: R.DELETE_CHANGES
-      } : Object.assign(Object.assign({}, _(u.content, t)), { type: ce(u.type) })), { number: u.oldNumber }) : void 0, y = c !== void 0 && c.newNumber !== void 0 ? Object.assign(Object.assign({}, h !== void 0 ? {
-        prefix: h.newLine.prefix,
-        content: h.newLine.content,
-        type: R.INSERT_CHANGES
-      } : Object.assign(Object.assign({}, _(c.content, t)), { type: ce(c.type) })), { number: c.newNumber }) : void 0, { left: L, right: o } = this.generateLineHtml(g, y);
-      r.left += L, r.right += o;
-    }
-    return r;
-  }
-  generateLineHtml(t, n) {
-    return {
-      left: this.generateSingleHtml(t),
-      right: this.generateSingleHtml(n)
-    };
-  }
-  generateSingleHtml(t) {
-    const n = "d2h-code-side-linenumber", e = "d2h-code-side-line";
-    return this.hoganUtils.render(ae, "line", {
-      type: t?.type || `${R.CONTEXT} d2h-emptyplaceholder`,
-      lineClass: t !== void 0 ? n : `${n} d2h-code-side-emptyplaceholder`,
-      contentClass: t !== void 0 ? e : `${e} d2h-code-side-emptyplaceholder`,
-      prefix: t?.prefix === " " ? "&nbsp;" : t?.prefix,
-      content: t?.content,
-      lineNumber: t?.number
-    });
-  }
+function Re(e, t = {}) {
+	let n = Object.assign(Object.assign({}, Ie), t), r = typeof e == "string" ? ne(e, n) : e, i = new Pe(n), { colorScheme: a } = n, o = { colorScheme: a };
+	return (n.drawFileList ? new xe(i, o).render(r) : "") + (n.outputFormat === "side-by-side" ? new je(i, n).render(r) : new Ee(i, n).render(r));
 }
-var ge = {}, Ge;
-function Dt() {
-  return Ge || (Ge = 1, (function(i) {
-    (function(t) {
-      var n = /\S/, e = /\"/g, r = /\n/g, s = /\r/g, a = /\\/g, u = /\u2028/, c = /\u2029/;
-      t.tags = {
-        "#": 1,
-        "^": 2,
-        "<": 3,
-        $: 4,
-        "/": 5,
-        "!": 6,
-        ">": 7,
-        "=": 8,
-        _v: 9,
-        "{": 10,
-        "&": 11,
-        _t: 12
-      }, t.scan = function(d, b) {
-        var C = d.length, A = 0, z = 1, P = 2, I = A, X = null, Y = null, k = "", B = [], Q = !1, m = 0, S = 0, w = "{{", $ = "}}";
-        function ne() {
-          k.length > 0 && (B.push({ tag: "_t", text: new String(k) }), k = "");
-        }
-        function pe() {
-          for (var V = !0, G = S; G < B.length; G++)
-            if (V = t.tags[B[G].tag] < t.tags._v || B[G].tag == "_t" && B[G].text.match(n) === null, !V)
-              return !1;
-          return V;
-        }
-        function Z(V, G) {
-          if (ne(), V && pe())
-            for (var q = S, K; q < B.length; q++)
-              B[q].text && ((K = B[q + 1]) && K.tag == ">" && (K.indent = B[q].text.toString()), B.splice(q, 1));
-          else G || B.push({ tag: `
-` });
-          Q = !1, S = B.length;
-        }
-        function ie(V, G) {
-          var q = "=" + $, K = V.indexOf(q, G), me = g(
-            V.substring(V.indexOf("=", G) + 1, K)
-          ).split(" ");
-          return w = me[0], $ = me[me.length - 1], K + q.length - 1;
-        }
-        for (b && (b = b.split(" "), w = b[0], $ = b[1]), m = 0; m < C; m++)
-          I == A ? y(w, d, m) ? (--m, ne(), I = z) : d.charAt(m) == `
-` ? Z(Q) : k += d.charAt(m) : I == z ? (m += w.length - 1, Y = t.tags[d.charAt(m + 1)], X = Y ? d.charAt(m + 1) : "_v", X == "=" ? (m = ie(d, m), I = A) : (Y && m++, I = P), Q = m) : y($, d, m) ? (B.push({
-            tag: X,
-            n: g(k),
-            otag: w,
-            ctag: $,
-            i: X == "/" ? Q - w.length : m + $.length
-          }), k = "", m += $.length - 1, I = A, X == "{" && ($ == "}}" ? m++ : h(B[B.length - 1]))) : k += d.charAt(m);
-        return Z(Q, !0), B;
-      };
-      function h(l) {
-        l.n.substr(l.n.length - 1) === "}" && (l.n = l.n.substring(0, l.n.length - 1));
-      }
-      function g(l) {
-        return l.trim ? l.trim() : l.replace(/^\s*|\s*$/g, "");
-      }
-      function y(l, d, b) {
-        if (d.charAt(b) != l.charAt(0))
-          return !1;
-        for (var C = 1, A = l.length; C < A; C++)
-          if (d.charAt(b + C) != l.charAt(C))
-            return !1;
-        return !0;
-      }
-      var L = { _t: !0, "\n": !0, $: !0, "/": !0 };
-      function o(l, d, b, C) {
-        var A = [], z = null, P = null, I = null;
-        for (P = b[b.length - 1]; l.length > 0; ) {
-          if (I = l.shift(), P && P.tag == "<" && !(I.tag in L))
-            throw new Error("Illegal content in < super tag.");
-          if (t.tags[I.tag] <= t.tags.$ || f(I, C))
-            b.push(I), I.nodes = o(l, I.tag, b, C);
-          else if (I.tag == "/") {
-            if (b.length === 0)
-              throw new Error("Closing tag without opener: /" + I.n);
-            if (z = b.pop(), I.n != z.n && !v(I.n, z.n, C))
-              throw new Error("Nesting error: " + z.n + " vs. " + I.n);
-            return z.end = I.i, A;
-          } else I.tag == `
-` && (I.last = l.length == 0 || l[0].tag == `
-`);
-          A.push(I);
-        }
-        if (b.length > 0)
-          throw new Error("missing closing tag: " + b.pop().n);
-        return A;
-      }
-      function f(l, d) {
-        for (var b = 0, C = d.length; b < C; b++)
-          if (d[b].o == l.n)
-            return l.tag = "#", !0;
-      }
-      function v(l, d, b) {
-        for (var C = 0, A = b.length; C < A; C++)
-          if (b[C].c == l && b[C].o == d)
-            return !0;
-      }
-      function p(l) {
-        var d = [];
-        for (var b in l)
-          d.push('"' + N(b) + '": function(c,p,t,i) {' + l[b] + "}");
-        return "{ " + d.join(",") + " }";
-      }
-      function T(l) {
-        var d = [];
-        for (var b in l.partials)
-          d.push('"' + N(b) + '":{name:"' + N(l.partials[b].name) + '", ' + T(l.partials[b]) + "}");
-        return "partials: {" + d.join(",") + "}, subs: " + p(l.subs);
-      }
-      t.stringify = function(l, d, b) {
-        return "{code: function (c,p,i) { " + t.wrapMain(l.code) + " }," + T(l) + "}";
-      };
-      var D = 0;
-      t.generate = function(l, d, b) {
-        D = 0;
-        var C = { code: "", subs: {}, partials: {} };
-        return t.walk(l, C), b.asString ? this.stringify(C, d, b) : this.makeTemplate(C, d, b);
-      }, t.wrapMain = function(l) {
-        return 'var t=this;t.b(i=i||"");' + l + "return t.fl();";
-      }, t.template = t.Template, t.makeTemplate = function(l, d, b) {
-        var C = this.makePartials(l);
-        return C.code = new Function("c", "p", "i", this.wrapMain(l.code)), new this.template(C, d, this, b);
-      }, t.makePartials = function(l) {
-        var d, b = { subs: {}, partials: l.partials, name: l.name };
-        for (d in b.partials)
-          b.partials[d] = this.makePartials(b.partials[d]);
-        for (d in l.subs)
-          b.subs[d] = new Function("c", "p", "t", "i", l.subs[d]);
-        return b;
-      };
-      function N(l) {
-        return l.replace(a, "\\\\").replace(e, '\\"').replace(r, "\\n").replace(s, "\\r").replace(u, "\\u2028").replace(c, "\\u2029");
-      }
-      function x(l) {
-        return ~l.indexOf(".") ? "d" : "f";
-      }
-      function E(l, d) {
-        var b = "<" + (d.prefix || ""), C = b + l.n + D++;
-        return d.partials[C] = { name: l.n, partials: {} }, d.code += 't.b(t.rp("' + N(C) + '",c,p,"' + (l.indent || "") + '"));', C;
-      }
-      t.codegen = {
-        "#": function(l, d) {
-          d.code += "if(t.s(t." + x(l.n) + '("' + N(l.n) + '",c,p,1),c,p,0,' + l.i + "," + l.end + ',"' + l.otag + " " + l.ctag + '")){t.rs(c,p,function(c,p,t){', t.walk(l.nodes, d), d.code += "});c.pop();}";
-        },
-        "^": function(l, d) {
-          d.code += "if(!t.s(t." + x(l.n) + '("' + N(l.n) + '",c,p,1),c,p,1,0,0,"")){', t.walk(l.nodes, d), d.code += "};";
-        },
-        ">": E,
-        "<": function(l, d) {
-          var b = { partials: {}, code: "", subs: {}, inPartial: !0 };
-          t.walk(l.nodes, b);
-          var C = d.partials[E(l, d)];
-          C.subs = b.subs, C.partials = b.partials;
-        },
-        $: function(l, d) {
-          var b = { subs: {}, code: "", partials: d.partials, prefix: l.n };
-          t.walk(l.nodes, b), d.subs[l.n] = b.code, d.inPartial || (d.code += 't.sub("' + N(l.n) + '",c,p,i);');
-        },
-        "\n": function(l, d) {
-          d.code += j('"\\n"' + (l.last ? "" : " + i"));
-        },
-        _v: function(l, d) {
-          d.code += "t.b(t.v(t." + x(l.n) + '("' + N(l.n) + '",c,p,0)));';
-        },
-        _t: function(l, d) {
-          d.code += j('"' + N(l.text) + '"');
-        },
-        "{": O,
-        "&": O
-      };
-      function O(l, d) {
-        d.code += "t.b(t.t(t." + x(l.n) + '("' + N(l.n) + '",c,p,0)));';
-      }
-      function j(l) {
-        return "t.b(" + l + ");";
-      }
-      t.walk = function(l, d) {
-        for (var b, C = 0, A = l.length; C < A; C++)
-          b = t.codegen[l[C].tag], b && b(l[C], d);
-        return d;
-      }, t.parse = function(l, d, b) {
-        return b = b || {}, o(l, "", [], b.sectionTags || []);
-      }, t.cache = {}, t.cacheKey = function(l, d) {
-        return [l, !!d.asString, !!d.disableLambda, d.delimiters, !!d.modelGet].join("||");
-      }, t.compile = function(l, d) {
-        d = d || {};
-        var b = t.cacheKey(l, d), C = this.cache[b];
-        if (C) {
-          var A = C.partials;
-          for (var z in A)
-            delete A[z].instance;
-          return C;
-        }
-        return C = this.generate(this.parse(this.scan(l, d.delimiters), l, d), l, d), this.cache[b] = C;
-      };
-    })(i);
-  })(ge)), ge;
-}
-var ve = {}, Ue;
-function Mt() {
-  return Ue || (Ue = 1, (function(i) {
-    (function(t) {
-      t.Template = function(o, f, v, p) {
-        o = o || {}, this.r = o.code || this.r, this.c = v, this.options = p || {}, this.text = f || "", this.partials = o.partials || {}, this.subs = o.subs || {}, this.buf = "";
-      }, t.Template.prototype = {
-        // render: replaced by generated code.
-        r: function(o, f, v) {
-          return "";
-        },
-        // variable escaping
-        v: y,
-        // triple stache
-        t: g,
-        render: function(f, v, p) {
-          return this.ri([f], v || {}, p);
-        },
-        // render internal -- a hook for overrides that catches partials too
-        ri: function(o, f, v) {
-          return this.r(o, f, v);
-        },
-        // ensurePartial
-        ep: function(o, f) {
-          var v = this.partials[o], p = f[v.name];
-          if (v.instance && v.base == p)
-            return v.instance;
-          if (typeof p == "string") {
-            if (!this.c)
-              throw new Error("No compiler available.");
-            p = this.c.compile(p, this.options);
-          }
-          if (!p)
-            return null;
-          if (this.partials[o].base = p, v.subs) {
-            f.stackText || (f.stackText = {});
-            for (key in v.subs)
-              f.stackText[key] || (f.stackText[key] = this.activeSub !== void 0 && f.stackText[this.activeSub] ? f.stackText[this.activeSub] : this.text);
-            p = e(
-              p,
-              v.subs,
-              v.partials,
-              this.stackSubs,
-              this.stackPartials,
-              f.stackText
-            );
-          }
-          return this.partials[o].instance = p, p;
-        },
-        // tries to find a partial in the current scope and render it
-        rp: function(o, f, v, p) {
-          var T = this.ep(o, v);
-          return T ? T.ri(f, v, p) : "";
-        },
-        // render a section
-        rs: function(o, f, v) {
-          var p = o[o.length - 1];
-          if (!L(p)) {
-            v(o, f, this);
-            return;
-          }
-          for (var T = 0; T < p.length; T++)
-            o.push(p[T]), v(o, f, this), o.pop();
-        },
-        // maybe start a section
-        s: function(o, f, v, p, T, D, N) {
-          var x;
-          return L(o) && o.length === 0 ? !1 : (typeof o == "function" && (o = this.ms(o, f, v, p, T, D, N)), x = !!o, !p && x && f && f.push(typeof o == "object" ? o : f[f.length - 1]), x);
-        },
-        // find values with dotted names
-        d: function(o, f, v, p) {
-          var T, D = o.split("."), N = this.f(D[0], f, v, p), x = this.options.modelGet, E = null;
-          if (o === "." && L(f[f.length - 2]))
-            N = f[f.length - 1];
-          else
-            for (var O = 1; O < D.length; O++)
-              T = n(D[O], N, x), T !== void 0 ? (E = N, N = T) : N = "";
-          return p && !N ? !1 : (!p && typeof N == "function" && (f.push(E), N = this.mv(N, f, v), f.pop()), N);
-        },
-        // find values with normal names
-        f: function(o, f, v, p) {
-          for (var T = !1, D = null, N = !1, x = this.options.modelGet, E = f.length - 1; E >= 0; E--)
-            if (D = f[E], T = n(o, D, x), T !== void 0) {
-              N = !0;
-              break;
-            }
-          return N ? (!p && typeof T == "function" && (T = this.mv(T, f, v)), T) : p ? !1 : "";
-        },
-        // higher order templates
-        ls: function(o, f, v, p, T, D) {
-          var N = this.options.delimiters;
-          return this.options.delimiters = D, this.b(this.ct(g(o.call(f, T, v)), f, p)), this.options.delimiters = N, !1;
-        },
-        // compile text
-        ct: function(o, f, v) {
-          if (this.options.disableLambda)
-            throw new Error("Lambda features disabled.");
-          return this.c.compile(o, this.options).render(f, v);
-        },
-        // template result buffering
-        b: function(o) {
-          this.buf += o;
-        },
-        fl: function() {
-          var o = this.buf;
-          return this.buf = "", o;
-        },
-        // method replace section
-        ms: function(o, f, v, p, T, D, N) {
-          var x, E = f[f.length - 1], O = o.call(E);
-          return typeof O == "function" ? p ? !0 : (x = this.activeSub && this.subsText && this.subsText[this.activeSub] ? this.subsText[this.activeSub] : this.text, this.ls(O, E, f, v, x.substring(T, D), N)) : O;
-        },
-        // method replace variable
-        mv: function(o, f, v) {
-          var p = f[f.length - 1], T = o.call(p);
-          return typeof T == "function" ? this.ct(g(T.call(p)), p, v) : T;
-        },
-        sub: function(o, f, v, p) {
-          var T = this.subs[o];
-          T && (this.activeSub = o, T(f, v, this, p), this.activeSub = !1);
-        }
-      };
-      function n(o, f, v) {
-        var p;
-        return f && typeof f == "object" && (f[o] !== void 0 ? p = f[o] : v && f.get && typeof f.get == "function" && (p = f.get(o))), p;
-      }
-      function e(o, f, v, p, T, D) {
-        function N() {
-        }
-        N.prototype = o;
-        function x() {
-        }
-        x.prototype = o.subs;
-        var E, O = new N();
-        O.subs = new x(), O.subsText = {}, O.buf = "", p = p || {}, O.stackSubs = p, O.subsText = D;
-        for (E in f)
-          p[E] || (p[E] = f[E]);
-        for (E in p)
-          O.subs[E] = p[E];
-        T = T || {}, O.stackPartials = T;
-        for (E in v)
-          T[E] || (T[E] = v[E]);
-        for (E in T)
-          O.partials[E] = T[E];
-        return O;
-      }
-      var r = /&/g, s = /</g, a = />/g, u = /\'/g, c = /\"/g, h = /[&<>\"\']/;
-      function g(o) {
-        return String(o ?? "");
-      }
-      function y(o) {
-        return o = g(o), h.test(o) ? o.replace(r, "&amp;").replace(s, "&lt;").replace(a, "&gt;").replace(u, "&#39;").replace(c, "&quot;") : o;
-      }
-      var L = Array.isArray || function(o) {
-        return Object.prototype.toString.call(o) === "[object Array]";
-      };
-    })(i);
-  })(ve)), ve;
-}
-var we, _e;
-function Ht() {
-  if (_e) return we;
-  _e = 1;
-  var i = Dt();
-  return i.Template = Mt().Template, i.template = i.Template, we = i, we;
-}
-var M = Ht();
-const F = {};
-F["file-summary-line"] = new M.Template({ code: function(i, t, n) {
-  var e = this;
-  return e.b(n = n || ""), e.b('<li class="d2h-file-list-line">'), e.b(`
-` + n), e.b('    <span class="d2h-file-name-wrapper">'), e.b(`
-` + n), e.b(e.rp("<fileIcon0", i, t, "      ")), e.b('      <a href="#'), e.b(e.v(e.f("fileHtmlId", i, t, 0))), e.b('" class="d2h-file-name">'), e.b(e.v(e.f("fileName", i, t, 0))), e.b("</a>"), e.b(`
-` + n), e.b('      <span class="d2h-file-stats">'), e.b(`
-` + n), e.b('          <span class="d2h-lines-added">'), e.b(e.v(e.f("addedLines", i, t, 0))), e.b("</span>"), e.b(`
-` + n), e.b('          <span class="d2h-lines-deleted">'), e.b(e.v(e.f("deletedLines", i, t, 0))), e.b("</span>"), e.b(`
-` + n), e.b("      </span>"), e.b(`
-` + n), e.b("    </span>"), e.b(`
-` + n), e.b("</li>"), e.fl();
-}, partials: { "<fileIcon0": { name: "fileIcon", partials: {}, subs: {} } }, subs: {} });
-F["file-summary-wrapper"] = new M.Template({ code: function(i, t, n) {
-  var e = this;
-  return e.b(n = n || ""), e.b('<div class="d2h-file-list-wrapper '), e.b(e.v(e.f("colorScheme", i, t, 0))), e.b('">'), e.b(`
-` + n), e.b('    <div class="d2h-file-list-header">'), e.b(`
-` + n), e.b('        <span class="d2h-file-list-title">Files changed ('), e.b(e.v(e.f("filesNumber", i, t, 0))), e.b(")</span>"), e.b(`
-` + n), e.b('        <a class="d2h-file-switch d2h-hide">hide</a>'), e.b(`
-` + n), e.b('        <a class="d2h-file-switch d2h-show">show</a>'), e.b(`
-` + n), e.b("    </div>"), e.b(`
-` + n), e.b('    <ol class="d2h-file-list">'), e.b(`
-` + n), e.b("    "), e.b(e.t(e.f("files", i, t, 0))), e.b(`
-` + n), e.b("    </ol>"), e.b(`
-` + n), e.b("</div>"), e.fl();
-}, partials: {}, subs: {} });
-F["generic-block-header"] = new M.Template({ code: function(i, t, n) {
-  var e = this;
-  return e.b(n = n || ""), e.b("<tr>"), e.b(`
-` + n), e.b('    <td class="'), e.b(e.v(e.f("lineClass", i, t, 0))), e.b(" "), e.b(e.v(e.d("CSSLineClass.INFO", i, t, 0))), e.b('"></td>'), e.b(`
-` + n), e.b('    <td class="'), e.b(e.v(e.d("CSSLineClass.INFO", i, t, 0))), e.b('">'), e.b(`
-` + n), e.b('        <div class="'), e.b(e.v(e.f("contentClass", i, t, 0))), e.b('">'), e.s(e.f("blockHeader", i, t, 1), i, t, 0, 156, 173, "{{ }}") && (e.rs(i, t, function(r, s, a) {
-    a.b(a.t(a.f("blockHeader", r, s, 0)));
-  }), i.pop()), e.s(e.f("blockHeader", i, t, 1), i, t, 1, 0, 0, "") || e.b("&nbsp;"), e.b("</div>"), e.b(`
-` + n), e.b("    </td>"), e.b(`
-` + n), e.b("</tr>"), e.fl();
-}, partials: {}, subs: {} });
-F["generic-empty-diff"] = new M.Template({ code: function(i, t, n) {
-  var e = this;
-  return e.b(n = n || ""), e.b("<tr>"), e.b(`
-` + n), e.b('    <td class="'), e.b(e.v(e.d("CSSLineClass.INFO", i, t, 0))), e.b('">'), e.b(`
-` + n), e.b('        <div class="'), e.b(e.v(e.f("contentClass", i, t, 0))), e.b('">'), e.b(`
-` + n), e.b("            File without changes"), e.b(`
-` + n), e.b("        </div>"), e.b(`
-` + n), e.b("    </td>"), e.b(`
-` + n), e.b("</tr>"), e.fl();
-}, partials: {}, subs: {} });
-F["generic-file-path"] = new M.Template({ code: function(i, t, n) {
-  var e = this;
-  return e.b(n = n || ""), e.b('<span class="d2h-file-name-wrapper">'), e.b(`
-` + n), e.b(e.rp("<fileIcon0", i, t, "    ")), e.b('    <span class="d2h-file-name">'), e.b(e.v(e.f("fileDiffName", i, t, 0))), e.b("</span>"), e.b(`
-` + n), e.b(e.rp("<fileTag1", i, t, "    ")), e.b("</span>"), e.b(`
-` + n), e.b('<label class="d2h-file-collapse">'), e.b(`
-` + n), e.b('    <input class="d2h-file-collapse-input" type="checkbox" name="viewed" value="viewed">'), e.b(`
-` + n), e.b("    Viewed"), e.b(`
-` + n), e.b("</label>"), e.fl();
-}, partials: { "<fileIcon0": { name: "fileIcon", partials: {}, subs: {} }, "<fileTag1": { name: "fileTag", partials: {}, subs: {} } }, subs: {} });
-F["generic-line"] = new M.Template({ code: function(i, t, n) {
-  var e = this;
-  return e.b(n = n || ""), e.b("<tr>"), e.b(`
-` + n), e.b('    <td class="'), e.b(e.v(e.f("lineClass", i, t, 0))), e.b(" "), e.b(e.v(e.f("type", i, t, 0))), e.b('">'), e.b(`
-` + n), e.b("      "), e.b(e.t(e.f("lineNumber", i, t, 0))), e.b(`
-` + n), e.b("    </td>"), e.b(`
-` + n), e.b('    <td class="'), e.b(e.v(e.f("type", i, t, 0))), e.b('">'), e.b(`
-` + n), e.b('        <div class="'), e.b(e.v(e.f("contentClass", i, t, 0))), e.b('">'), e.b(`
-` + n), e.s(e.f("prefix", i, t, 1), i, t, 0, 162, 238, "{{ }}") && (e.rs(i, t, function(r, s, a) {
-    a.b('            <span class="d2h-code-line-prefix">'), a.b(a.t(a.f("prefix", r, s, 0))), a.b("</span>"), a.b(`
-` + n);
-  }), i.pop()), e.s(e.f("prefix", i, t, 1), i, t, 1, 0, 0, "") || (e.b('            <span class="d2h-code-line-prefix">&nbsp;</span>'), e.b(`
-` + n)), e.s(e.f("content", i, t, 1), i, t, 0, 371, 445, "{{ }}") && (e.rs(i, t, function(r, s, a) {
-    a.b('            <span class="d2h-code-line-ctn">'), a.b(a.t(a.f("content", r, s, 0))), a.b("</span>"), a.b(`
-` + n);
-  }), i.pop()), e.s(e.f("content", i, t, 1), i, t, 1, 0, 0, "") || (e.b('            <span class="d2h-code-line-ctn"><br></span>'), e.b(`
-` + n)), e.b("        </div>"), e.b(`
-` + n), e.b("    </td>"), e.b(`
-` + n), e.b("</tr>"), e.fl();
-}, partials: {}, subs: {} });
-F["generic-wrapper"] = new M.Template({ code: function(i, t, n) {
-  var e = this;
-  return e.b(n = n || ""), e.b('<div class="d2h-wrapper '), e.b(e.v(e.f("colorScheme", i, t, 0))), e.b('">'), e.b(`
-` + n), e.b("    "), e.b(e.t(e.f("content", i, t, 0))), e.b(`
-` + n), e.b("</div>"), e.fl();
-}, partials: {}, subs: {} });
-F["icon-file-added"] = new M.Template({ code: function(i, t, n) {
-  var e = this;
-  return e.b(n = n || ""), e.b('<svg aria-hidden="true" class="d2h-icon d2h-added" height="16" title="added" version="1.1" viewBox="0 0 14 16"'), e.b(`
-` + n), e.b('     width="14">'), e.b(`
-` + n), e.b('    <path d="M13 1H1C0.45 1 0 1.45 0 2v12c0 0.55 0.45 1 1 1h12c0.55 0 1-0.45 1-1V2c0-0.55-0.45-1-1-1z m0 13H1V2h12v12zM6 9H3V7h3V4h2v3h3v2H8v3H6V9z"></path>'), e.b(`
-` + n), e.b("</svg>"), e.fl();
-}, partials: {}, subs: {} });
-F["icon-file-changed"] = new M.Template({ code: function(i, t, n) {
-  var e = this;
-  return e.b(n = n || ""), e.b('<svg aria-hidden="true" class="d2h-icon d2h-changed" height="16" title="modified" version="1.1"'), e.b(`
-` + n), e.b('     viewBox="0 0 14 16" width="14">'), e.b(`
-` + n), e.b('    <path d="M13 1H1C0.45 1 0 1.45 0 2v12c0 0.55 0.45 1 1 1h12c0.55 0 1-0.45 1-1V2c0-0.55-0.45-1-1-1z m0 13H1V2h12v12zM4 8c0-1.66 1.34-3 3-3s3 1.34 3 3-1.34 3-3 3-3-1.34-3-3z"></path>'), e.b(`
-` + n), e.b("</svg>"), e.fl();
-}, partials: {}, subs: {} });
-F["icon-file-deleted"] = new M.Template({ code: function(i, t, n) {
-  var e = this;
-  return e.b(n = n || ""), e.b('<svg aria-hidden="true" class="d2h-icon d2h-deleted" height="16" title="removed" version="1.1"'), e.b(`
-` + n), e.b('     viewBox="0 0 14 16" width="14">'), e.b(`
-` + n), e.b('    <path d="M13 1H1C0.45 1 0 1.45 0 2v12c0 0.55 0.45 1 1 1h12c0.55 0 1-0.45 1-1V2c0-0.55-0.45-1-1-1z m0 13H1V2h12v12zM11 9H3V7h8v2z"></path>'), e.b(`
-` + n), e.b("</svg>"), e.fl();
-}, partials: {}, subs: {} });
-F["icon-file-renamed"] = new M.Template({ code: function(i, t, n) {
-  var e = this;
-  return e.b(n = n || ""), e.b('<svg aria-hidden="true" class="d2h-icon d2h-moved" height="16" title="renamed" version="1.1"'), e.b(`
-` + n), e.b('     viewBox="0 0 14 16" width="14">'), e.b(`
-` + n), e.b('    <path d="M6 9H3V7h3V4l5 4-5 4V9z m8-7v12c0 0.55-0.45 1-1 1H1c-0.55 0-1-0.45-1-1V2c0-0.55 0.45-1 1-1h12c0.55 0 1 0.45 1 1z m-1 0H1v12h12V2z"></path>'), e.b(`
-` + n), e.b("</svg>"), e.fl();
-}, partials: {}, subs: {} });
-F["icon-file"] = new M.Template({ code: function(i, t, n) {
-  var e = this;
-  return e.b(n = n || ""), e.b('<svg aria-hidden="true" class="d2h-icon" height="16" version="1.1" viewBox="0 0 12 16" width="12">'), e.b(`
-` + n), e.b('    <path d="M6 5H2v-1h4v1zM2 8h7v-1H2v1z m0 2h7v-1H2v1z m0 2h7v-1H2v1z m10-7.5v9.5c0 0.55-0.45 1-1 1H1c-0.55 0-1-0.45-1-1V2c0-0.55 0.45-1 1-1h7.5l3.5 3.5z m-1 0.5L8 2H1v12h10V5z"></path>'), e.b(`
-` + n), e.b("</svg>"), e.fl();
-}, partials: {}, subs: {} });
-F["line-by-line-file-diff"] = new M.Template({ code: function(i, t, n) {
-  var e = this;
-  return e.b(n = n || ""), e.b('<div id="'), e.b(e.v(e.f("fileHtmlId", i, t, 0))), e.b('" class="d2h-file-wrapper" data-lang="'), e.b(e.v(e.d("file.language", i, t, 0))), e.b('">'), e.b(`
-` + n), e.b('    <div class="d2h-file-header">'), e.b(`
-` + n), e.b("    "), e.b(e.t(e.f("filePath", i, t, 0))), e.b(`
-` + n), e.b("    </div>"), e.b(`
-` + n), e.b('    <div class="d2h-file-diff">'), e.b(`
-` + n), e.b('        <div class="d2h-code-wrapper">'), e.b(`
-` + n), e.b('            <table class="d2h-diff-table">'), e.b(`
-` + n), e.b('                <tbody class="d2h-diff-tbody">'), e.b(`
-` + n), e.b("                "), e.b(e.t(e.f("diffs", i, t, 0))), e.b(`
-` + n), e.b("                </tbody>"), e.b(`
-` + n), e.b("            </table>"), e.b(`
-` + n), e.b("        </div>"), e.b(`
-` + n), e.b("    </div>"), e.b(`
-` + n), e.b("</div>"), e.fl();
-}, partials: {}, subs: {} });
-F["line-by-line-numbers"] = new M.Template({ code: function(i, t, n) {
-  var e = this;
-  return e.b(n = n || ""), e.b('<div class="line-num1">'), e.b(e.v(e.f("oldNumber", i, t, 0))), e.b("</div>"), e.b(`
-` + n), e.b('<div class="line-num2">'), e.b(e.v(e.f("newNumber", i, t, 0))), e.b("</div>"), e.fl();
-}, partials: {}, subs: {} });
-F["side-by-side-file-diff"] = new M.Template({ code: function(i, t, n) {
-  var e = this;
-  return e.b(n = n || ""), e.b('<div id="'), e.b(e.v(e.f("fileHtmlId", i, t, 0))), e.b('" class="d2h-file-wrapper" data-lang="'), e.b(e.v(e.d("file.language", i, t, 0))), e.b('">'), e.b(`
-` + n), e.b('    <div class="d2h-file-header">'), e.b(`
-` + n), e.b("      "), e.b(e.t(e.f("filePath", i, t, 0))), e.b(`
-` + n), e.b("    </div>"), e.b(`
-` + n), e.b('    <div class="d2h-files-diff">'), e.b(`
-` + n), e.b('        <div class="d2h-file-side-diff">'), e.b(`
-` + n), e.b('            <div class="d2h-code-wrapper">'), e.b(`
-` + n), e.b('                <table class="d2h-diff-table">'), e.b(`
-` + n), e.b('                    <tbody class="d2h-diff-tbody">'), e.b(`
-` + n), e.b("                    "), e.b(e.t(e.d("diffs.left", i, t, 0))), e.b(`
-` + n), e.b("                    </tbody>"), e.b(`
-` + n), e.b("                </table>"), e.b(`
-` + n), e.b("            </div>"), e.b(`
-` + n), e.b("        </div>"), e.b(`
-` + n), e.b('        <div class="d2h-file-side-diff">'), e.b(`
-` + n), e.b('            <div class="d2h-code-wrapper">'), e.b(`
-` + n), e.b('                <table class="d2h-diff-table">'), e.b(`
-` + n), e.b('                    <tbody class="d2h-diff-tbody">'), e.b(`
-` + n), e.b("                    "), e.b(e.t(e.d("diffs.right", i, t, 0))), e.b(`
-` + n), e.b("                    </tbody>"), e.b(`
-` + n), e.b("                </table>"), e.b(`
-` + n), e.b("            </div>"), e.b(`
-` + n), e.b("        </div>"), e.b(`
-` + n), e.b("    </div>"), e.b(`
-` + n), e.b("</div>"), e.fl();
-}, partials: {}, subs: {} });
-F["tag-file-added"] = new M.Template({ code: function(i, t, n) {
-  var e = this;
-  return e.b(n = n || ""), e.b('<span class="d2h-tag d2h-added d2h-added-tag">ADDED</span>'), e.fl();
-}, partials: {}, subs: {} });
-F["tag-file-changed"] = new M.Template({ code: function(i, t, n) {
-  var e = this;
-  return e.b(n = n || ""), e.b('<span class="d2h-tag d2h-changed d2h-changed-tag">CHANGED</span>'), e.fl();
-}, partials: {}, subs: {} });
-F["tag-file-deleted"] = new M.Template({ code: function(i, t, n) {
-  var e = this;
-  return e.b(n = n || ""), e.b('<span class="d2h-tag d2h-deleted d2h-deleted-tag">DELETED</span>'), e.fl();
-}, partials: {}, subs: {} });
-F["tag-file-renamed"] = new M.Template({ code: function(i, t, n) {
-  var e = this;
-  return e.b(n = n || ""), e.b('<span class="d2h-tag d2h-moved d2h-moved-tag">RENAMED</span>'), e.fl();
-}, partials: {}, subs: {} });
-class Ft {
-  constructor({ compiledTemplates: t = {}, rawTemplates: n = {} }) {
-    const e = Object.entries(n).reduce((r, [s, a]) => {
-      const u = M.compile(a, { asString: !1 });
-      return Object.assign(Object.assign({}, r), { [s]: u });
-    }, {});
-    this.preCompiledTemplates = Object.assign(Object.assign(Object.assign({}, F), t), e);
-  }
-  static compile(t) {
-    return M.compile(t, { asString: !1 });
-  }
-  render(t, n, e, r, s) {
-    const a = this.templateKey(t, n);
-    try {
-      return this.preCompiledTemplates[a].render(e, r, s);
-    } catch {
-      throw new Error(`Could not find template to render '${a}'`);
-    }
-  }
-  template(t, n) {
-    return this.preCompiledTemplates[this.templateKey(t, n)];
-  }
-  templateKey(t, n) {
-    return `${t}-${n}`;
-  }
-}
-const Me = Object.assign(Object.assign(Object.assign({}, Qe), Ze), { outputFormat: Ke.LINE_BY_LINE, drawFileList: !0 });
-function At(i, t = {}) {
-  return qe(i, Object.assign(Object.assign({}, Me), t));
-}
-function Bt(i, t = {}) {
-  const n = Object.assign(Object.assign({}, Me), t), e = typeof i == "string" ? qe(i, n) : i, r = new Ft(n), { colorScheme: s } = n, a = { colorScheme: s }, u = n.drawFileList ? new Nt(r, a).render(e) : "", c = n.outputFormat === "side-by-side" ? new It(r, n).render(e) : new Et(r, n).render(e);
-  return u + c;
-}
-const Rt = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
-  __proto__: null,
-  defaultDiff2HtmlConfig: Me,
-  html: Bt,
-  parse: At
-}, Symbol.toStringTag, { value: "Module" }));
-window.Diff2Html = Rt;
+//#endregion
+//#region resources/js/index.js
+window.Diff2Html = Fe;
+//#endregion
