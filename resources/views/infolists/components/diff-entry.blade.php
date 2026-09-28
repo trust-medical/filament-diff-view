@@ -1,20 +1,31 @@
-<div
-    x-data="{
-    diff: @js($getDiff()),
-    init() {
-        this.render();
-    },
-    render() {
-        if (!this.diff) return;
+@php
+    use Filament\Support\Facades\FilamentAsset;
+    use TrustMedical\DiffView\DiffViewServiceProvider;
 
-        const target = this.$refs.diffContainer;
-        const diffHtml = Diff2Html.html(this.diff, @js($getDiff2HtmlOptions()));
-        target.innerHTML = diffHtml;
-    }
-}"
-    x-init="init"
-    wire:ignore
-    @class(['d2h-hide-tags' => $getHideFileTags()])
->
-    <div x-ref="diffContainer"></div>
-</div>
+    $diff = $getDiff();
+@endphp
+
+<x-dynamic-component :component="$getEntryWrapperView()" :entry="$entry">
+    @if (filled($diff))
+        <div
+            wire:ignore
+            wire:key="{{ $getKey() ?? $getStatePath() }}.{{ md5($diff) }}"
+            x-load
+            x-load-src="{{ FilamentAsset::getAlpineComponentSrc('diff-entry', DiffViewServiceProvider::ASSET_PACKAGE) }}"
+            x-load-css="[@js(FilamentAsset::getStyleHref('diff-entry', DiffViewServiceProvider::ASSET_PACKAGE))]"
+            x-data="diffEntryComponent({
+                diff: @js($diff),
+                options: @js($getDiff2HtmlOptions()),
+                colorScheme: @js($getColorScheme()),
+            })"
+            {{
+                $getExtraAttributeBag()->class([
+                    'fi-diff-entry',
+                    'd2h-hide-tags' => $getHideFileTags(),
+                ])
+            }}
+        >
+            <div x-ref="container"></div>
+        </div>
+    @endif
+</x-dynamic-component>

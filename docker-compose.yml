@@ -11,6 +11,7 @@ services:
     environment:
       SERVICE_NAME: app
       SERVICE_TAGS: dev
+      HOME: /tmp
     working_dir: /var/www/html
     volumes:
       - .:/var/www/html

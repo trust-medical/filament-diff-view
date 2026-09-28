@@ -7,7 +7,7 @@ use Filament\Panel;
 
 /**
  * DiffView Plugin class.
- * Used to register the plugin into the Filament v4 Panel.
+ * Optional plugin class for registering the package on a Filament panel.
  */
 class DiffView implements Plugin
 {

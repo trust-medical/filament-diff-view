@@ -1,7 +1,7 @@
-FROM php:8.4-fpm-bullseye
+FROM php:8.4-fpm-bookworm
 
-# システム依存関係のインストール
-RUN apt-get update && apt-get install -y \
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     curl \
     libpng-dev \
@@ -11,22 +11,24 @@ RUN apt-get update && apt-get install -y \
     unzip \
     libzip-dev \
     libicu-dev \
-    gnupg
+    gnupg \
+    && rm -rf /var/lib/apt/lists/*
 
-# PHP拡張機能のインストール
+# Install PHP extensions
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl
 
-# Composerのインストール
+# Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Node.jsとnpmのインストール
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs
+# Install Node.js (LTS) and npm
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
+    && rm -rf /var/lib/apt/lists/*
 
-# 作業ディレクトリの設定
+# Set the working directory
 WORKDIR /var/www/html
 
-# 権限の設定
+# Set permissions
 RUN chown -R www-data:www-data /var/www
 
 USER www-data
