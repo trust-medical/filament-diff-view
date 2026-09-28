@@ -1,13 +1,20 @@
 {
     "name": "trust-medical/diff-view",
-    "version": "2.0.0",
-    "description": "A Filament plugin for viewing diffs.",
+    "version": "2.1.0",
+    "description": "A Filament plugin that renders text differences in Infolists, powered by diff2html.",
     "keywords": [
         "laravel",
         "filament",
-        "diff-view"
+        "filament-plugin",
+        "diff",
+        "diff2html",
+        "infolist"
     ],
-    "homepage": "https://github.com/trust-medical/diff-view",
+    "homepage": "https://github.com/trust-medical/filament-diff-view",
+    "support": {
+        "issues": "https://github.com/trust-medical/filament-diff-view/issues",
+        "source": "https://github.com/trust-medical/filament-diff-view"
+    },
     "license": "MIT",
     "authors": [
         {
@@ -19,10 +26,10 @@
         "php": "^8.4",
         "filament/filament": "^4.0|^5.0",
         "spatie/laravel-package-tools": "^1.15",
-        "sebastian/diff": "^8.0.0"
+        "sebastian/diff": "^6.0|^7.0|^8.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^11.0.0",
+        "orchestra/testbench": "^10.0|^11.0",
         "laravel/pint": "^1.0",
         "larastan/larastan": "^3.0"
     },
@@ -36,11 +43,21 @@
             "TrustMedical\\DiffView\\Tests\\": "tests/"
         }
     },
+    "scripts": {
+        "test": "phpunit",
+        "analyse": "phpstan analyse",
+        "format": "pint"
+    },
+    "config": {
+        "sort-packages": true
+    },
     "extra": {
         "laravel": {
             "providers": [
                 "TrustMedical\\DiffView\\DiffViewServiceProvider"
             ]
         }
-    }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
 }
