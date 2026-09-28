@@ -1,0 +1,1548 @@
+//#region \0rolldown/runtime.js
+var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescriptor, r = Object.getOwnPropertyNames, i = Object.getPrototypeOf, a = Object.prototype.hasOwnProperty, o = (e, t) => () => (t || e((t = { exports: {} }).exports, t), t.exports), s = (e, i, o, s) => {
+	if (i && typeof i == "object" || typeof i == "function") for (var c = r(i), l = 0, u = c.length, d; l < u; l++) d = c[l], !a.call(e, d) && d !== o && t(e, d, {
+		get: ((e) => i[e]).bind(null, d),
+		enumerable: !(s = n(i, d)) || s.enumerable
+	});
+	return e;
+}, c = (n, r, a) => (a = n == null ? {} : e(i(n)), s(r || !n || !n.__esModule ? t(a, "default", {
+	value: n,
+	enumerable: !0
+}) : a, n)), l;
+(function(e) {
+	e.INSERT = "insert", e.DELETE = "delete", e.CONTEXT = "context";
+})(l ||= {});
+var u = {
+	LINE_BY_LINE: "line-by-line",
+	SIDE_BY_SIDE: "side-by-side"
+}, d = {
+	LINES: "lines",
+	WORDS: "words",
+	NONE: "none"
+}, f = {
+	WORD: "word",
+	CHAR: "char"
+}, p;
+(function(e) {
+	e.AUTO = "auto", e.DARK = "dark", e.LIGHT = "light";
+})(p ||= {});
+//#endregion
+//#region node_modules/diff2html/lib-esm/utils.js
+var m = RegExp("[" + [
+	"-",
+	"[",
+	"]",
+	"/",
+	"{",
+	"}",
+	"(",
+	")",
+	"*",
+	"+",
+	"?",
+	".",
+	"\\",
+	"^",
+	"$",
+	"|"
+].join("\\") + "]", "g");
+function h(e) {
+	return e.replace(m, "\\$&");
+}
+function g(e) {
+	return e && e.replace(/\\/g, "/");
+}
+function _(e) {
+	let t, n, r, i = 0;
+	for (t = 0, r = e.length; t < r; t++) n = e.charCodeAt(t), i = (i << 5) - i + n, i |= 0;
+	return i;
+}
+function v(e) {
+	let t = e.length, n = -Infinity;
+	for (let r = 0; r < t; r++) n = Math.max(n, e[r]);
+	return n;
+}
+//#endregion
+//#region node_modules/diff2html/lib-esm/diff-parser.js
+function y(e, t) {
+	let n = e.split(".");
+	return n.length > 1 ? n[n.length - 1] : t;
+}
+function b(e, t) {
+	return t.reduce((t, n) => t || e.startsWith(n), !1);
+}
+var x = [
+	"a/",
+	"b/",
+	"i/",
+	"w/",
+	"c/",
+	"o/"
+];
+function S(e, t, n) {
+	let r = n === void 0 ? x : [...x, n], [, i = ""] = (t ? RegExp(`^${h(t)} "?(.+?)"?$`) : /* @__PURE__ */ RegExp("^\"?(.+?)\"?$")).exec(e) || [], a = r.find((e) => i.indexOf(e) === 0);
+	return (a ? i.slice(a.length) : i).replace(/\s+\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:\.\d+)? [+-]\d{4}.*$/, "");
+}
+function C(e, t) {
+	return S(e, "---", t);
+}
+function ee(e, t) {
+	return S(e, "+++", t);
+}
+function te(e, t = {}) {
+	let n = [], r = null, i = null, a = null, o = null, s = null, c = null, u = null, d = "--- ", f = "+++ ", p = /^old mode (\d{6})/, m = /^new mode (\d{6})/, h = /^deleted file mode (\d{6})/, g = /^new file mode (\d{6})/, _ = /^copy from "?(.+)"?/, v = /^copy to "?(.+)"?/, x = /^rename from "?(.+)"?/, te = /^rename to "?(.+)"?/, w = /^similarity index (\d+)%/, ne = /^dissimilarity index (\d+)%/, re = /^index ([\da-z]+)\.\.([\da-z]+)\s*(\d{6})?/, T = /^Binary files (.*) and (.*) differ/, E = /^GIT binary patch/, D = /^index ([\da-z]+),([\da-z]+)\.\.([\da-z]+)/, O = /^mode (\d{6}),(\d{6})\.\.(\d{6})/, k = /^new file mode (\d{6})/, A = /^deleted file mode (\d{6}),(\d{6})/, j = e.replace(/\\ No newline at end of file/g, "").replace(/\r\n?/g, "\n").split("\n");
+	function M() {
+		i !== null && r !== null && (r.blocks.push(i), i = null);
+	}
+	function N() {
+		r !== null && (!r.oldName && c !== null && (r.oldName = c), !r.newName && u !== null && (r.newName = u), r.newName && (n.push(r), r = null)), c = null, u = null;
+	}
+	function P() {
+		M(), N(), r = {
+			blocks: [],
+			deletedLines: 0,
+			addedLines: 0
+		};
+	}
+	function F(e) {
+		M();
+		let t;
+		r !== null && ((t = /^@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@.*/.exec(e)) ? (r.isCombined = !1, a = parseInt(t[1], 10), s = parseInt(t[2], 10)) : (t = /^@@@ -(\d+)(?:,\d+)? -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@@.*/.exec(e)) ? (r.isCombined = !0, a = parseInt(t[1], 10), o = parseInt(t[2], 10), s = parseInt(t[3], 10)) : (e.startsWith("@@") && console.error("Failed to parse lines, starting in 0!"), a = 0, s = 0, r.isCombined = !1)), i = {
+			lines: [],
+			oldStartLine: a,
+			oldStartLine2: o,
+			newStartLine: s,
+			header: e
+		};
+	}
+	function ie(e) {
+		if (r === null || i === null || a === null || s === null) return;
+		let t = { content: e }, n = r.isCombined ? [
+			"+ ",
+			" +",
+			"++"
+		] : ["+"], o = r.isCombined ? [
+			"- ",
+			" -",
+			"--"
+		] : ["-"];
+		b(e, n) ? (r.addedLines++, t.type = l.INSERT, t.oldNumber = void 0, t.newNumber = s++) : b(e, o) ? (r.deletedLines++, t.type = l.DELETE, t.oldNumber = a++, t.newNumber = void 0) : (t.type = l.CONTEXT, t.oldNumber = a++, t.newNumber = s++), i.lines.push(t);
+	}
+	function ae(e, t) {
+		let n = t;
+		for (; n < j.length - 3;) {
+			if (e.startsWith("diff")) return !1;
+			if (j[n].startsWith(d) && j[n + 1].startsWith(f) && j[n + 2].startsWith("@@")) return !0;
+			n++;
+		}
+		return !1;
+	}
+	return j.forEach((e, a) => {
+		if (!e || e.startsWith("*")) return;
+		let o, s = j[a - 1], l = j[a + 1], b = j[a + 2];
+		if (e.startsWith("diff --git") || e.startsWith("diff --combined")) {
+			if (P(), (o = /^diff --git "?([a-ciow]\/.+)"? "?([a-ciow]\/.+)"?/.exec(e)) && (c = S(o[1], void 0, t.dstPrefix), u = S(o[2], void 0, t.srcPrefix)), r === null) throw Error("Where is my file !!!");
+			r.isGitDiff = !0;
+			return;
+		}
+		if (e.startsWith("Binary files") && !r?.isGitDiff) {
+			if (P(), (o = /^Binary files "?([a-ciow]\/.+)"? and "?([a-ciow]\/.+)"? differ/.exec(e)) && (c = S(o[1], void 0, t.dstPrefix), u = S(o[2], void 0, t.srcPrefix)), r === null) throw Error("Where is my file !!!");
+			r.isBinary = !0;
+			return;
+		}
+		if ((!r || !r.isGitDiff && r && e.startsWith(d) && l.startsWith(f) && b.startsWith("@@")) && P(), r?.isTooBig) return;
+		if (r && (typeof t.diffMaxChanges == "number" && r.addedLines + r.deletedLines > t.diffMaxChanges || typeof t.diffMaxLineLength == "number" && e.length > t.diffMaxLineLength)) {
+			r.isTooBig = !0, r.addedLines = 0, r.deletedLines = 0, r.blocks = [], i = null, F(typeof t.diffTooBigMessage == "function" ? t.diffTooBigMessage(n.length) : "Diff too big to be displayed");
+			return;
+		}
+		if (e.startsWith(d) && l.startsWith(f) || e.startsWith(f) && s.startsWith(d)) {
+			if (r && !r.oldName && e.startsWith("--- ") && (o = C(e, t.srcPrefix))) {
+				r.oldName = o, r.language = y(r.oldName, r.language);
+				return;
+			}
+			if (r && !r.newName && e.startsWith("+++ ") && (o = ee(e, t.dstPrefix))) {
+				r.newName = o, r.language = y(r.newName, r.language);
+				return;
+			}
+		}
+		if (r && (e.startsWith("@@") || r.isGitDiff && r.oldName && r.newName && !i)) {
+			F(e);
+			return;
+		}
+		if (i && (e.startsWith("+") || e.startsWith("-") || e.startsWith(" "))) {
+			ie(e);
+			return;
+		}
+		let M = !ae(e, a);
+		if (r === null) throw Error("Where is my file !!!");
+		(o = p.exec(e)) ? r.oldMode = o[1] : (o = m.exec(e)) ? r.newMode = o[1] : (o = h.exec(e)) ? (r.deletedFileMode = o[1], r.isDeleted = !0) : (o = g.exec(e)) ? (r.newFileMode = o[1], r.isNew = !0) : (o = _.exec(e)) ? (M && (r.oldName = o[1]), r.isCopy = !0) : (o = v.exec(e)) ? (M && (r.newName = o[1]), r.isCopy = !0) : (o = x.exec(e)) ? (M && (r.oldName = o[1]), r.isRename = !0) : (o = te.exec(e)) ? (M && (r.newName = o[1]), r.isRename = !0) : (o = T.exec(e)) ? (r.isBinary = !0, r.oldName = S(o[1], void 0, t.srcPrefix), r.newName = S(o[2], void 0, t.dstPrefix), F("Binary file")) : E.test(e) ? (r.isBinary = !0, F(e)) : (o = w.exec(e)) ? r.unchangedPercentage = parseInt(o[1], 10) : (o = ne.exec(e)) ? r.changedPercentage = parseInt(o[1], 10) : (o = re.exec(e)) ? (r.checksumBefore = o[1], r.checksumAfter = o[2], o[3] && (r.mode = o[3])) : (o = D.exec(e)) ? (r.checksumBefore = [o[2], o[3]], r.checksumAfter = o[1]) : (o = O.exec(e)) ? (r.oldMode = [o[2], o[3]], r.newMode = o[1]) : (o = k.exec(e)) ? (r.newFileMode = o[1], r.isNew = !0) : (o = A.exec(e)) && (r.deletedFileMode = o[1], r.isDeleted = !0);
+	}), M(), N(), n;
+}
+//#endregion
+//#region node_modules/diff/libesm/diff/base.js
+var w = class {
+	diff(e, t, n = {}) {
+		let r;
+		typeof n == "function" ? (r = n, n = {}) : "callback" in n && (r = n.callback);
+		let i = this.castInput(e, n), a = this.castInput(t, n), o = this.removeEmpty(this.tokenize(i, n)), s = this.removeEmpty(this.tokenize(a, n));
+		return this.diffWithOptionsObj(o, s, n, r);
+	}
+	diffWithOptionsObj(e, t, n, r) {
+		let i = (e) => {
+			if (e = this.postProcess(e, n), r) {
+				setTimeout(function() {
+					r(e);
+				}, 0);
+				return;
+			} else return e;
+		}, a = t.length, o = e.length, s = 1, c = a + o;
+		n.maxEditLength != null && (c = Math.min(c, n.maxEditLength));
+		let l = n.timeout ?? Infinity, u = Date.now() + l, d = [{
+			oldPos: -1,
+			lastComponent: void 0
+		}], f = this.extractCommon(d[0], t, e, 0, n);
+		if (d[0].oldPos + 1 >= o && f + 1 >= a) return i(this.buildValues(d[0].lastComponent, t, e));
+		let p = -Infinity, m = Infinity, h = () => {
+			for (let r = Math.max(p, -s); r <= Math.min(m, s); r += 2) {
+				let s, c = d[r - 1], l = d[r + 1];
+				c && (d[r - 1] = void 0);
+				let u = !1;
+				if (l) {
+					let e = l.oldPos - r;
+					u = l && 0 <= e && e < a;
+				}
+				let h = c && c.oldPos + 1 < o;
+				if (!u && !h) {
+					d[r] = void 0;
+					continue;
+				}
+				if (s = !h || u && c.oldPos < l.oldPos ? this.addToPath(l, !0, !1, 0, n) : this.addToPath(c, !1, !0, 1, n), f = this.extractCommon(s, t, e, r, n), s.oldPos + 1 >= o && f + 1 >= a) return i(this.buildValues(s.lastComponent, t, e)) || !0;
+				d[r] = s, s.oldPos + 1 >= o && (m = Math.min(m, r - 1)), f + 1 >= a && (p = Math.max(p, r + 1));
+			}
+			s++;
+		};
+		if (r) (function e() {
+			setTimeout(function() {
+				if (s > c || Date.now() > u) return r(void 0);
+				h() || e();
+			}, 0);
+		})();
+		else for (; s <= c && Date.now() <= u;) {
+			let e = h();
+			if (e) return e;
+		}
+	}
+	addToPath(e, t, n, r, i) {
+		let a = e.lastComponent;
+		return a && !i.oneChangePerToken && a.added === t && a.removed === n ? {
+			oldPos: e.oldPos + r,
+			lastComponent: {
+				count: a.count + 1,
+				added: t,
+				removed: n,
+				previousComponent: a.previousComponent
+			}
+		} : {
+			oldPos: e.oldPos + r,
+			lastComponent: {
+				count: 1,
+				added: t,
+				removed: n,
+				previousComponent: a
+			}
+		};
+	}
+	extractCommon(e, t, n, r, i) {
+		let a = t.length, o = n.length, s = e.oldPos, c = s - r, l = 0;
+		for (; c + 1 < a && s + 1 < o && this.equals(n[s + 1], t[c + 1], i);) c++, s++, l++, i.oneChangePerToken && (e.lastComponent = {
+			count: 1,
+			previousComponent: e.lastComponent,
+			added: !1,
+			removed: !1
+		});
+		return l && !i.oneChangePerToken && (e.lastComponent = {
+			count: l,
+			previousComponent: e.lastComponent,
+			added: !1,
+			removed: !1
+		}), e.oldPos = s, c;
+	}
+	equals(e, t, n) {
+		return n.comparator ? n.comparator(e, t) : e === t || !!n.ignoreCase && e.toLowerCase() === t.toLowerCase();
+	}
+	removeEmpty(e) {
+		let t = [];
+		for (let n = 0; n < e.length; n++) e[n] && t.push(e[n]);
+		return t;
+	}
+	castInput(e, t) {
+		return e;
+	}
+	tokenize(e, t) {
+		return Array.from(e);
+	}
+	join(e) {
+		return e.join("");
+	}
+	postProcess(e, t) {
+		return e;
+	}
+	get useLongestToken() {
+		return !1;
+	}
+	buildValues(e, t, n) {
+		let r = [], i;
+		for (; e;) r.push(e), i = e.previousComponent, delete e.previousComponent, e = i;
+		r.reverse();
+		let a = r.length, o = 0, s = 0, c = 0;
+		for (; o < a; o++) {
+			let e = r[o];
+			if (e.removed) e.value = this.join(n.slice(c, c + e.count)), c += e.count;
+			else {
+				if (!e.added && this.useLongestToken) {
+					let r = t.slice(s, s + e.count);
+					r = r.map(function(e, t) {
+						let r = n[c + t];
+						return r.length > e.length ? r : e;
+					}), e.value = this.join(r);
+				} else e.value = this.join(t.slice(s, s + e.count));
+				s += e.count, e.added || (c += e.count);
+			}
+		}
+		return r;
+	}
+}, ne = new class extends w {}();
+function re(e, t, n) {
+	return ne.diff(e, t, n);
+}
+//#endregion
+//#region node_modules/diff/libesm/util/string.js
+function T(e, t) {
+	let n;
+	for (n = 0; n < e.length && n < t.length; n++) if (e[n] != t[n]) return e.slice(0, n);
+	return e.slice(0, n);
+}
+function E(e, t) {
+	let n;
+	if (!e || !t || e[e.length - 1] != t[t.length - 1]) return "";
+	for (n = 0; n < e.length && n < t.length; n++) if (e[e.length - (n + 1)] != t[t.length - (n + 1)]) return e.slice(-n);
+	return e.slice(-n);
+}
+function D(e, t, n) {
+	if (e.slice(0, t.length) != t) throw Error(`string ${JSON.stringify(e)} doesn't start with prefix ${JSON.stringify(t)}; this is a bug`);
+	return n + e.slice(t.length);
+}
+function O(e, t, n) {
+	if (!t) return e + n;
+	if (e.slice(-t.length) != t) throw Error(`string ${JSON.stringify(e)} doesn't end with suffix ${JSON.stringify(t)}; this is a bug`);
+	return e.slice(0, -t.length) + n;
+}
+function k(e, t) {
+	return D(e, t, "");
+}
+function A(e, t) {
+	return O(e, t, "");
+}
+function j(e, t) {
+	return t.slice(0, M(e, t));
+}
+function M(e, t) {
+	let n = 0;
+	e.length > t.length && (n = e.length - t.length);
+	let r = t.length;
+	e.length < t.length && (r = e.length);
+	let i = Array(r), a = 0;
+	i[0] = 0;
+	for (let e = 1; e < r; e++) {
+		for (t[e] == t[a] ? i[e] = i[a] : i[e] = a; a > 0 && t[e] != t[a];) a = i[a];
+		t[e] == t[a] && a++;
+	}
+	a = 0;
+	for (let r = n; r < e.length; r++) {
+		for (; a > 0 && e[r] != t[a];) a = i[a];
+		e[r] == t[a] && a++;
+	}
+	return a;
+}
+function N(e) {
+	let t;
+	for (t = e.length - 1; t >= 0 && e[t].match(/\s/); t--);
+	return e.substring(t + 1);
+}
+function P(e) {
+	let t = e.match(/^\s*/);
+	return t ? t[0] : "";
+}
+//#endregion
+//#region node_modules/diff/libesm/diff/word.js
+var F = "a-zA-Z0-9_\\u{AD}\\u{C0}-\\u{D6}\\u{D8}-\\u{F6}\\u{F8}-\\u{2C6}\\u{2C8}-\\u{2D7}\\u{2DE}-\\u{2FF}\\u{1E00}-\\u{1EFF}", ie = RegExp(`[${F}]+|\\s+|[^${F}]`, "ug");
+new class extends w {
+	equals(e, t, n) {
+		return n.ignoreCase && (e = e.toLowerCase(), t = t.toLowerCase()), e.trim() === t.trim();
+	}
+	tokenize(e, t = {}) {
+		let n;
+		if (t.intlSegmenter) {
+			let r = t.intlSegmenter;
+			if (r.resolvedOptions().granularity != "word") throw Error("The segmenter passed must have a granularity of \"word\"");
+			n = [];
+			for (let t of Array.from(r.segment(e))) {
+				let e = t.segment;
+				n.length && /\s/.test(n[n.length - 1]) && /\s/.test(e) ? n[n.length - 1] += e : n.push(e);
+			}
+		} else n = e.match(ie) || [];
+		let r = [], i = null;
+		return n.forEach((e) => {
+			/\s/.test(e) ? i == null ? r.push(e) : r.push(r.pop() + e) : i != null && /\s/.test(i) ? r[r.length - 1] == i ? r.push(r.pop() + e) : r.push(i + e) : r.push(e), i = e;
+		}), r;
+	}
+	join(e) {
+		return e.map((e, t) => t == 0 ? e : e.replace(/^\s+/, "")).join("");
+	}
+	postProcess(e, t) {
+		if (!e || t.oneChangePerToken) return e;
+		let n = null, r = null, i = null;
+		return e.forEach((e) => {
+			e.added ? r = e : e.removed ? i = e : ((r || i) && ae(n, i, r, e), n = e, r = null, i = null);
+		}), (r || i) && ae(n, i, r, null), e;
+	}
+}();
+function ae(e, t, n, r) {
+	if (t && n) {
+		let i = P(t.value), a = N(t.value), o = P(n.value), s = N(n.value);
+		if (e) {
+			let r = T(i, o);
+			e.value = O(e.value, o, r), t.value = k(t.value, r), n.value = k(n.value, r);
+		}
+		if (r) {
+			let e = E(a, s);
+			r.value = D(r.value, s, e), t.value = A(t.value, e), n.value = A(n.value, e);
+		}
+	} else if (n) {
+		if (e) {
+			let e = P(n.value);
+			n.value = n.value.substring(e.length);
+		}
+		if (r) {
+			let e = P(r.value);
+			r.value = r.value.substring(e.length);
+		}
+	} else if (e && r) {
+		let n = P(r.value), i = P(t.value), a = N(t.value), o = T(n, i);
+		t.value = k(t.value, o);
+		let s = E(k(n, o), a);
+		t.value = A(t.value, s), r.value = D(r.value, n, s), e.value = O(e.value, n, n.slice(0, n.length - s.length));
+	} else if (r) {
+		let e = P(r.value), n = j(N(t.value), e);
+		t.value = A(t.value, n);
+	} else if (e) {
+		let n = j(N(e.value), P(t.value));
+		t.value = k(t.value, n);
+	}
+}
+var oe = new class extends w {
+	tokenize(e) {
+		let t = RegExp(`(\\r?\\n)|[${F}]+|[^\\S\\n\\r]+|[^${F}]`, "ug");
+		return e.match(t) || [];
+	}
+}();
+function se(e, t, n) {
+	return oe.diff(e, t, n);
+}
+new class extends w {
+	constructor() {
+		super(...arguments), this.tokenize = ce;
+	}
+	equals(e, t, n) {
+		return n.ignoreWhitespace ? ((!n.newlineIsToken || !e.includes("\n")) && (e = e.trim()), (!n.newlineIsToken || !t.includes("\n")) && (t = t.trim())) : n.ignoreNewlineAtEof && !n.newlineIsToken && (e.endsWith("\n") && (e = e.slice(0, -1)), t.endsWith("\n") && (t = t.slice(0, -1))), super.equals(e, t, n);
+	}
+}();
+function ce(e, t) {
+	t.stripTrailingCr && (e = e.replace(/\r\n/g, "\n"));
+	let n = [], r = e.split(/(\n|\r\n)/);
+	r[r.length - 1] || r.pop();
+	for (let e = 0; e < r.length; e++) {
+		let i = r[e];
+		e % 2 && !t.newlineIsToken ? n[n.length - 1] += i : n.push(i);
+	}
+	return n;
+}
+//#endregion
+//#region node_modules/diff/libesm/diff/sentence.js
+function le(e) {
+	return e == "." || e == "!" || e == "?";
+}
+new class extends w {
+	tokenize(e) {
+		let t = [], n = 0;
+		for (let r = 0; r < e.length; r++) {
+			if (r == e.length - 1) {
+				t.push(e.slice(n));
+				break;
+			}
+			if (le(e[r]) && e[r + 1].match(/\s/)) {
+				for (t.push(e.slice(n, r + 1)), r = n = r + 1; e[r + 1]?.match(/\s/);) r++;
+				t.push(e.slice(n, r + 1)), n = r + 1;
+			}
+		}
+		return t;
+	}
+}(), new class extends w {
+	tokenize(e) {
+		return e.split(/([{}:;,]|\s+)/);
+	}
+}(), new class extends w {
+	constructor() {
+		super(...arguments), this.tokenize = ce;
+	}
+	get useLongestToken() {
+		return !0;
+	}
+	castInput(e, t) {
+		let { undefinedReplacement: n, stringifyReplacer: r = (e, t) => t === void 0 ? n : t } = t;
+		return typeof e == "string" ? e : JSON.stringify(I(e, null, null, r), null, "  ");
+	}
+	equals(e, t, n) {
+		return super.equals(e.replace(/,([\r\n])/g, "$1"), t.replace(/,([\r\n])/g, "$1"), n);
+	}
+}();
+function I(e, t, n, r, i) {
+	t ||= [], n ||= [], r && (e = r(i === void 0 ? "" : i, e));
+	let a;
+	for (a = 0; a < t.length; a += 1) if (t[a] === e) return n[a];
+	let o;
+	if (Object.prototype.toString.call(e) === "[object Array]") {
+		for (t.push(e), o = Array(e.length), n.push(o), a = 0; a < e.length; a += 1) o[a] = I(e[a], t, n, r, String(a));
+		return t.pop(), n.pop(), o;
+	}
+	if (e && e.toJSON && (e = e.toJSON()), typeof e == "object" && e) {
+		t.push(e), o = {}, n.push(o);
+		let i = [], s;
+		for (s in e)
+ /* istanbul ignore else */
+		Object.prototype.hasOwnProperty.call(e, s) && i.push(s);
+		for (i.sort(), a = 0; a < i.length; a += 1) s = i[a], o[s] = I(e[s], t, n, r, s);
+		t.pop(), n.pop();
+	} else o = e;
+	return o;
+}
+new class extends w {
+	tokenize(e) {
+		return e.slice();
+	}
+	join(e) {
+		return e;
+	}
+	removeEmpty(e) {
+		return e;
+	}
+}();
+//#endregion
+//#region node_modules/diff2html/lib-esm/rematch.js
+function ue(e, t) {
+	if (e.length === 0) return t.length;
+	if (t.length === 0) return e.length;
+	let n = [], r;
+	for (r = 0; r <= t.length; r++) n[r] = [r];
+	let i;
+	for (i = 0; i <= e.length; i++) n[0][i] = i;
+	for (r = 1; r <= t.length; r++) for (i = 1; i <= e.length; i++) t.charAt(r - 1) === e.charAt(i - 1) ? n[r][i] = n[r - 1][i - 1] : n[r][i] = Math.min(n[r - 1][i - 1] + 1, Math.min(n[r][i - 1] + 1, n[r - 1][i] + 1));
+	return n[t.length][e.length];
+}
+function L(e) {
+	return (t, n) => {
+		let r = e(t).trim(), i = e(n).trim();
+		return ue(r, i) / (r.length + i.length);
+	};
+}
+function R(e) {
+	function t(t, n, r = /* @__PURE__ */ new Map()) {
+		let i = Infinity, a;
+		for (let o = 0; o < t.length; ++o) for (let s = 0; s < n.length; ++s) {
+			let c = JSON.stringify([t[o], n[s]]), l;
+			r.has(c) && (l = r.get(c)) || (l = e(t[o], n[s]), r.set(c, l)), l < i && (i = l, a = {
+				indexA: o,
+				indexB: s,
+				score: i
+			});
+		}
+		return a;
+	}
+	function n(e, r, i = 0, a = /* @__PURE__ */ new Map()) {
+		let o = t(e, r, a);
+		if (!o || e.length + r.length < 3) return [[e, r]];
+		let s = e.slice(0, o.indexA), c = r.slice(0, o.indexB), l = [e[o.indexA]], u = [r[o.indexB]], d = o.indexA + 1, f = o.indexB + 1, p = e.slice(d), m = r.slice(f), h = n(s, c, i + 1, a), g = n(l, u, i + 1, a), _ = n(p, m, i + 1, a), v = g;
+		return (o.indexA > 0 || o.indexB > 0) && (v = h.concat(v)), (e.length > d || r.length > f) && (v = v.concat(_)), v;
+	}
+	return n;
+}
+//#endregion
+//#region node_modules/diff2html/lib-esm/render-utils.js
+var z = {
+	INSERTS: "d2h-ins",
+	DELETES: "d2h-del",
+	CONTEXT: "d2h-cntx",
+	INFO: "d2h-info",
+	INSERT_CHANGES: "d2h-ins d2h-change",
+	DELETE_CHANGES: "d2h-del d2h-change"
+}, B = {
+	matching: d.NONE,
+	matchWordsThreshold: .25,
+	maxLineLengthHighlight: 1e4,
+	diffStyle: f.WORD,
+	colorScheme: p.LIGHT
+}, V = "/", de = L((e) => e.value), fe = R(de);
+function H(e) {
+	return e.indexOf("dev/null") !== -1;
+}
+function pe(e) {
+	return e.replace(/(<ins[^>]*>((.|\n)*?)<\/ins>)/g, "");
+}
+function me(e) {
+	return e.replace(/(<del[^>]*>((.|\n)*?)<\/del>)/g, "");
+}
+function U(e) {
+	switch (e) {
+		case l.CONTEXT: return z.CONTEXT;
+		case l.INSERT: return z.INSERTS;
+		case l.DELETE: return z.DELETES;
+	}
+}
+function W(e) {
+	switch (e) {
+		case p.DARK: return "d2h-dark-color-scheme";
+		case p.AUTO: return "d2h-auto-color-scheme";
+		case p.LIGHT:
+		default: return "d2h-light-color-scheme";
+	}
+}
+function he(e) {
+	return e ? 2 : 1;
+}
+function G(e) {
+	return e.slice(0).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#x27;").replace(/\//g, "&#x2F;");
+}
+function K(e, t, n = !0) {
+	let r = he(t);
+	return {
+		prefix: e.substring(0, r),
+		content: n ? G(e.substring(r)) : e.substring(r)
+	};
+}
+function q(e) {
+	let t = g(e.oldName), n = g(e.newName);
+	if (t !== n && !H(t) && !H(n)) {
+		let e = [], r = [], i = t.split(V), a = n.split(V), o = i.length, s = a.length, c = 0, l = o - 1, u = s - 1;
+		for (; c < l && c < u && i[c] === a[c];) e.push(a[c]), c += 1;
+		for (; l > c && u > c && i[l] === a[u];) r.unshift(a[u]), --l, --u;
+		let d = e.join(V), f = r.join(V), p = i.slice(c, l + 1).join(V), m = a.slice(c, u + 1).join(V);
+		return d.length && f.length ? d + V + "{" + p + " → " + m + "}/" + f : d.length ? d + V + "{" + p + " → " + m + "}" : f.length ? "{" + p + " → " + m + "}/" + f : t + " → " + n;
+	} else if (H(n)) return t;
+	else return n;
+}
+function J(e) {
+	return `d2h-${_(q(e)).toString().slice(-6)}`;
+}
+function Y(e) {
+	let t = "file-changed";
+	return e.isRename || e.isCopy ? t = "file-renamed" : e.isNew ? t = "file-added" : e.isDeleted ? t = "file-deleted" : e.newName !== e.oldName && (t = "file-renamed"), t;
+}
+function ge(e, t, n, r = {}) {
+	let { matching: i, maxLineLengthHighlight: a, matchWordsThreshold: o, diffStyle: s } = Object.assign(Object.assign({}, B), r), c = K(e, n, !1), l = K(t, n, !1);
+	if (c.content.length > a || l.content.length > a) return {
+		oldLine: {
+			prefix: c.prefix,
+			content: G(c.content)
+		},
+		newLine: {
+			prefix: l.prefix,
+			content: G(l.content)
+		}
+	};
+	let u = s === "char" ? re(c.content, l.content) : se(c.content, l.content), d = [];
+	if (s === "word" && i === "words") {
+		let e = u.filter((e) => e.removed);
+		fe(u.filter((e) => e.added), e).forEach((e) => {
+			e[0].length === 1 && e[1].length === 1 && de(e[0][0], e[1][0]) < o && (d.push(e[0][0]), d.push(e[1][0]));
+		});
+	}
+	let f = u.reduce((e, t) => {
+		let n = t.added ? "ins" : t.removed ? "del" : null, r = d.indexOf(t) > -1 ? " class=\"d2h-change\"" : "", i = G(t.value);
+		return n === null ? `${e}${i}` : `${e}<${n}${r}>${i}</${n}>`;
+	}, "");
+	return {
+		oldLine: {
+			prefix: c.prefix,
+			content: pe(f)
+		},
+		newLine: {
+			prefix: l.prefix,
+			content: me(f)
+		}
+	};
+}
+//#endregion
+//#region node_modules/diff2html/lib-esm/file-list-renderer.js
+var _e = "file-summary", ve = "icon", ye = { colorScheme: B.colorScheme }, be = class {
+	constructor(e, t = {}) {
+		this.hoganUtils = e, this.config = Object.assign(Object.assign({}, ye), t);
+	}
+	render(e) {
+		let t = e.map((e) => this.hoganUtils.render(_e, "line", {
+			fileHtmlId: J(e),
+			oldName: e.oldName,
+			newName: e.newName,
+			fileName: q(e),
+			deletedLines: "-" + e.deletedLines,
+			addedLines: "+" + e.addedLines
+		}, { fileIcon: this.hoganUtils.template(ve, Y(e)) })).join("\n");
+		return this.hoganUtils.render(_e, "wrapper", {
+			colorScheme: W(this.config.colorScheme),
+			filesNumber: e.length,
+			files: t
+		});
+	}
+}, xe = Object.assign(Object.assign({}, B), {
+	renderNothingWhenEmpty: !1,
+	matchingMaxComparisons: 2500,
+	maxLineSizeInBlockForComparison: 200
+}), X = "generic", Se = "line-by-line", Ce = "icon", we = "tag", Te = class {
+	constructor(e, t = {}) {
+		this.hoganUtils = e, this.config = Object.assign(Object.assign({}, xe), t);
+	}
+	render(e) {
+		let t = e.map((e) => {
+			let t;
+			return t = e.blocks.length ? this.generateFileHtml(e) : this.generateEmptyDiff(), this.makeFileDiffHtml(e, t);
+		}).join("\n");
+		return this.hoganUtils.render(X, "wrapper", {
+			colorScheme: W(this.config.colorScheme),
+			content: t
+		});
+	}
+	makeFileDiffHtml(e, t) {
+		if (this.config.renderNothingWhenEmpty && Array.isArray(e.blocks) && e.blocks.length === 0) return "";
+		let n = this.hoganUtils.template(Se, "file-diff"), r = this.hoganUtils.template(X, "file-path"), i = this.hoganUtils.template(Ce, "file"), a = this.hoganUtils.template(we, Y(e));
+		return n.render({
+			file: e,
+			fileHtmlId: J(e),
+			diffs: t,
+			filePath: r.render({ fileDiffName: q(e) }, {
+				fileIcon: i,
+				fileTag: a
+			})
+		});
+	}
+	generateEmptyDiff() {
+		return this.hoganUtils.render(X, "empty-diff", {
+			contentClass: "d2h-code-line",
+			CSSLineClass: z
+		});
+	}
+	generateFileHtml(e) {
+		let t = R(L((t) => K(t.content, e.isCombined).content));
+		return e.blocks.map((n) => {
+			let r = this.hoganUtils.render(X, "block-header", {
+				CSSLineClass: z,
+				blockHeader: e.isTooBig ? n.header : G(n.header),
+				lineClass: "d2h-code-linenumber",
+				contentClass: "d2h-code-line"
+			});
+			return this.applyLineGroupping(n).forEach(([n, i, a]) => {
+				if (i.length && a.length && !n.length) this.applyRematchMatching(i, a, t).map(([t, n]) => {
+					let { left: i, right: a } = this.processChangedLines(e, e.isCombined, t, n);
+					r += i, r += a;
+				});
+				else if (n.length) n.forEach((t) => {
+					let { prefix: n, content: i } = K(t.content, e.isCombined);
+					r += this.generateSingleLineHtml(e, {
+						type: z.CONTEXT,
+						prefix: n,
+						content: i,
+						oldNumber: t.oldNumber,
+						newNumber: t.newNumber
+					});
+				});
+				else if (i.length || a.length) {
+					let { left: t, right: n } = this.processChangedLines(e, e.isCombined, i, a);
+					r += t, r += n;
+				} else console.error("Unknown state reached while processing groups of lines", n, i, a);
+			}), r;
+		}).join("\n");
+	}
+	applyLineGroupping(e) {
+		let t = [], n = [], r = [];
+		for (let i = 0; i < e.lines.length; i++) {
+			let a = e.lines[i];
+			(a.type !== l.INSERT && r.length || a.type === l.CONTEXT && n.length > 0) && (t.push([
+				[],
+				n,
+				r
+			]), n = [], r = []), a.type === l.CONTEXT ? t.push([
+				[a],
+				[],
+				[]
+			]) : a.type === l.INSERT && n.length === 0 ? t.push([
+				[],
+				[],
+				[a]
+			]) : a.type === l.INSERT && n.length > 0 ? r.push(a) : a.type === l.DELETE && n.push(a);
+		}
+		return (n.length || r.length) && (t.push([
+			[],
+			n,
+			r
+		]), n = [], r = []), t;
+	}
+	applyRematchMatching(e, t, n) {
+		let r = e.length * t.length, i = v(e.concat(t).map((e) => e.content.length));
+		return r < this.config.matchingMaxComparisons && i < this.config.maxLineSizeInBlockForComparison && (this.config.matching === "lines" || this.config.matching === "words") ? n(e, t) : [[e, t]];
+	}
+	processChangedLines(e, t, n, r) {
+		let i = {
+			right: "",
+			left: ""
+		}, a = Math.max(n.length, r.length);
+		for (let o = 0; o < a; o++) {
+			let a = n[o], s = r[o], c = a !== void 0 && s !== void 0 ? ge(a.content, s.content, t, this.config) : void 0, l = a !== void 0 && a.oldNumber !== void 0 ? Object.assign(Object.assign({}, c === void 0 ? Object.assign(Object.assign({}, K(a.content, t)), { type: U(a.type) }) : {
+				prefix: c.oldLine.prefix,
+				content: c.oldLine.content,
+				type: z.DELETE_CHANGES
+			}), {
+				oldNumber: a.oldNumber,
+				newNumber: a.newNumber
+			}) : void 0, u = s !== void 0 && s.newNumber !== void 0 ? Object.assign(Object.assign({}, c === void 0 ? Object.assign(Object.assign({}, K(s.content, t)), { type: U(s.type) }) : {
+				prefix: c.newLine.prefix,
+				content: c.newLine.content,
+				type: z.INSERT_CHANGES
+			}), {
+				oldNumber: s.oldNumber,
+				newNumber: s.newNumber
+			}) : void 0, { left: d, right: f } = this.generateLineHtml(e, l, u);
+			i.left += d, i.right += f;
+		}
+		return i;
+	}
+	generateLineHtml(e, t, n) {
+		return {
+			left: this.generateSingleLineHtml(e, t),
+			right: this.generateSingleLineHtml(e, n)
+		};
+	}
+	generateSingleLineHtml(e, t) {
+		if (t === void 0) return "";
+		let n = this.hoganUtils.render(Se, "numbers", {
+			oldNumber: t.oldNumber || "",
+			newNumber: t.newNumber || ""
+		});
+		return this.hoganUtils.render(X, "line", {
+			type: t.type,
+			lineClass: "d2h-code-linenumber",
+			contentClass: "d2h-code-line",
+			prefix: t.prefix === " " ? "&nbsp;" : t.prefix,
+			content: t.content,
+			lineNumber: n,
+			line: t,
+			file: e
+		});
+	}
+}, Ee = Object.assign(Object.assign({}, B), {
+	renderNothingWhenEmpty: !1,
+	matchingMaxComparisons: 2500,
+	maxLineSizeInBlockForComparison: 200
+}), Z = "generic", De = "side-by-side", Oe = "icon", ke = "tag", Ae = class {
+	constructor(e, t = {}) {
+		this.hoganUtils = e, this.config = Object.assign(Object.assign({}, Ee), t);
+	}
+	render(e) {
+		let t = e.map((e) => {
+			let t;
+			return t = e.blocks.length ? this.generateFileHtml(e) : this.generateEmptyDiff(), this.makeFileDiffHtml(e, t);
+		}).join("\n");
+		return this.hoganUtils.render(Z, "wrapper", {
+			colorScheme: W(this.config.colorScheme),
+			content: t
+		});
+	}
+	makeFileDiffHtml(e, t) {
+		if (this.config.renderNothingWhenEmpty && Array.isArray(e.blocks) && e.blocks.length === 0) return "";
+		let n = this.hoganUtils.template(De, "file-diff"), r = this.hoganUtils.template(Z, "file-path"), i = this.hoganUtils.template(Oe, "file"), a = this.hoganUtils.template(ke, Y(e));
+		return n.render({
+			file: e,
+			fileHtmlId: J(e),
+			diffs: t,
+			filePath: r.render({ fileDiffName: q(e) }, {
+				fileIcon: i,
+				fileTag: a
+			})
+		});
+	}
+	generateEmptyDiff() {
+		return {
+			right: "",
+			left: this.hoganUtils.render(Z, "empty-diff", {
+				contentClass: "d2h-code-side-line",
+				CSSLineClass: z
+			})
+		};
+	}
+	generateFileHtml(e) {
+		let t = R(L((t) => K(t.content, e.isCombined).content));
+		return e.blocks.map((n) => {
+			let r = {
+				left: this.makeHeaderHtml(n.header, e),
+				right: this.makeHeaderHtml("")
+			};
+			return this.applyLineGroupping(n).forEach(([n, i, a]) => {
+				if (i.length && a.length && !n.length) this.applyRematchMatching(i, a, t).map(([t, n]) => {
+					let { left: i, right: a } = this.processChangedLines(e.isCombined, t, n);
+					r.left += i, r.right += a;
+				});
+				else if (n.length) n.forEach((t) => {
+					let { prefix: n, content: i } = K(t.content, e.isCombined), { left: a, right: o } = this.generateLineHtml({
+						type: z.CONTEXT,
+						prefix: n,
+						content: i,
+						number: t.oldNumber
+					}, {
+						type: z.CONTEXT,
+						prefix: n,
+						content: i,
+						number: t.newNumber
+					});
+					r.left += a, r.right += o;
+				});
+				else if (i.length || a.length) {
+					let { left: t, right: n } = this.processChangedLines(e.isCombined, i, a);
+					r.left += t, r.right += n;
+				} else console.error("Unknown state reached while processing groups of lines", n, i, a);
+			}), r;
+		}).reduce((e, t) => ({
+			left: e.left + t.left,
+			right: e.right + t.right
+		}), {
+			left: "",
+			right: ""
+		});
+	}
+	applyLineGroupping(e) {
+		let t = [], n = [], r = [];
+		for (let i = 0; i < e.lines.length; i++) {
+			let a = e.lines[i];
+			(a.type !== l.INSERT && r.length || a.type === l.CONTEXT && n.length > 0) && (t.push([
+				[],
+				n,
+				r
+			]), n = [], r = []), a.type === l.CONTEXT ? t.push([
+				[a],
+				[],
+				[]
+			]) : a.type === l.INSERT && n.length === 0 ? t.push([
+				[],
+				[],
+				[a]
+			]) : a.type === l.INSERT && n.length > 0 ? r.push(a) : a.type === l.DELETE && n.push(a);
+		}
+		return (n.length || r.length) && (t.push([
+			[],
+			n,
+			r
+		]), n = [], r = []), t;
+	}
+	applyRematchMatching(e, t, n) {
+		let r = e.length * t.length, i = v(e.concat(t).map((e) => e.content.length));
+		return r < this.config.matchingMaxComparisons && i < this.config.maxLineSizeInBlockForComparison && (this.config.matching === "lines" || this.config.matching === "words") ? n(e, t) : [[e, t]];
+	}
+	makeHeaderHtml(e, t) {
+		return this.hoganUtils.render(Z, "block-header", {
+			CSSLineClass: z,
+			blockHeader: t?.isTooBig ? e : G(e),
+			lineClass: "d2h-code-side-linenumber",
+			contentClass: "d2h-code-side-line"
+		});
+	}
+	processChangedLines(e, t, n) {
+		let r = {
+			right: "",
+			left: ""
+		}, i = Math.max(t.length, n.length);
+		for (let a = 0; a < i; a++) {
+			let i = t[a], o = n[a], s = i !== void 0 && o !== void 0 ? ge(i.content, o.content, e, this.config) : void 0, c = i !== void 0 && i.oldNumber !== void 0 ? Object.assign(Object.assign({}, s === void 0 ? Object.assign(Object.assign({}, K(i.content, e)), { type: U(i.type) }) : {
+				prefix: s.oldLine.prefix,
+				content: s.oldLine.content,
+				type: z.DELETE_CHANGES
+			}), { number: i.oldNumber }) : void 0, l = o !== void 0 && o.newNumber !== void 0 ? Object.assign(Object.assign({}, s === void 0 ? Object.assign(Object.assign({}, K(o.content, e)), { type: U(o.type) }) : {
+				prefix: s.newLine.prefix,
+				content: s.newLine.content,
+				type: z.INSERT_CHANGES
+			}), { number: o.newNumber }) : void 0, { left: u, right: d } = this.generateLineHtml(c, l);
+			r.left += u, r.right += d;
+		}
+		return r;
+	}
+	generateLineHtml(e, t) {
+		return {
+			left: this.generateSingleHtml(e),
+			right: this.generateSingleHtml(t)
+		};
+	}
+	generateSingleHtml(e) {
+		let t = "d2h-code-side-linenumber", n = "d2h-code-side-line";
+		return this.hoganUtils.render(Z, "line", {
+			type: e?.type || `${z.CONTEXT} d2h-emptyplaceholder`,
+			lineClass: e === void 0 ? `${t} d2h-code-side-emptyplaceholder` : t,
+			contentClass: e === void 0 ? `${n} d2h-code-side-emptyplaceholder` : n,
+			prefix: e?.prefix === " " ? "&nbsp;" : e?.prefix,
+			content: e?.content,
+			lineNumber: e?.number
+		});
+	}
+}, je = /* @__PURE__ */ o(((e) => {
+	(function(e) {
+		var t = /\S/, n = /\"/g, r = /\n/g, i = /\r/g, a = /\\/g, o = /\u2028/, s = /\u2029/;
+		e.tags = {
+			"#": 1,
+			"^": 2,
+			"<": 3,
+			$: 4,
+			"/": 5,
+			"!": 6,
+			">": 7,
+			"=": 8,
+			_v: 9,
+			"{": 10,
+			"&": 11,
+			_t: 12
+		}, e.scan = function(n, r) {
+			var i = n.length, a = 0, o = 1, s = 2, d = a, f = null, p = null, m = "", h = [], g = !1, _ = 0, v = 0, y = "{{", b = "}}";
+			function x() {
+				m.length > 0 && (h.push({
+					tag: "_t",
+					text: new String(m)
+				}), m = "");
+			}
+			function S() {
+				for (var n = !0, r = v; r < h.length; r++) if (n = e.tags[h[r].tag] < e.tags._v || h[r].tag == "_t" && h[r].text.match(t) === null, !n) return !1;
+				return n;
+			}
+			function C(e, t) {
+				if (x(), e && S()) for (var n = v, r; n < h.length; n++) h[n].text && ((r = h[n + 1]) && r.tag == ">" && (r.indent = h[n].text.toString()), h.splice(n, 1));
+				else t || h.push({ tag: "\n" });
+				g = !1, v = h.length;
+			}
+			function ee(e, t) {
+				var n = "=" + b, r = e.indexOf(n, t), i = l(e.substring(e.indexOf("=", t) + 1, r)).split(" ");
+				return y = i[0], b = i[i.length - 1], r + n.length - 1;
+			}
+			for (r && (r = r.split(" "), y = r[0], b = r[1]), _ = 0; _ < i; _++) d == a ? u(y, n, _) ? (--_, x(), d = o) : n.charAt(_) == "\n" ? C(g) : m += n.charAt(_) : d == o ? (_ += y.length - 1, p = e.tags[n.charAt(_ + 1)], f = p ? n.charAt(_ + 1) : "_v", f == "=" ? (_ = ee(n, _), d = a) : (p && _++, d = s), g = _) : u(b, n, _) ? (h.push({
+				tag: f,
+				n: l(m),
+				otag: y,
+				ctag: b,
+				i: f == "/" ? g - y.length : _ + b.length
+			}), m = "", _ += b.length - 1, d = a, f == "{" && (b == "}}" ? _++ : c(h[h.length - 1]))) : m += n.charAt(_);
+			return C(g, !0), h;
+		};
+		function c(e) {
+			e.n.substr(e.n.length - 1) === "}" && (e.n = e.n.substring(0, e.n.length - 1));
+		}
+		function l(e) {
+			return e.trim ? e.trim() : e.replace(/^\s*|\s*$/g, "");
+		}
+		function u(e, t, n) {
+			if (t.charAt(n) != e.charAt(0)) return !1;
+			for (var r = 1, i = e.length; r < i; r++) if (t.charAt(n + r) != e.charAt(r)) return !1;
+			return !0;
+		}
+		var d = {
+			_t: !0,
+			"\n": !0,
+			$: !0,
+			"/": !0
+		};
+		function f(t, n, r, i) {
+			var a = [], o = null, s = null, c = null;
+			for (s = r[r.length - 1]; t.length > 0;) {
+				if (c = t.shift(), s && s.tag == "<" && !(c.tag in d)) throw Error("Illegal content in < super tag.");
+				if (e.tags[c.tag] <= e.tags.$ || p(c, i)) r.push(c), c.nodes = f(t, c.tag, r, i);
+				else if (c.tag == "/") {
+					if (r.length === 0) throw Error("Closing tag without opener: /" + c.n);
+					if (o = r.pop(), c.n != o.n && !m(c.n, o.n, i)) throw Error("Nesting error: " + o.n + " vs. " + c.n);
+					return o.end = c.i, a;
+				} else c.tag == "\n" && (c.last = t.length == 0 || t[0].tag == "\n");
+				a.push(c);
+			}
+			if (r.length > 0) throw Error("missing closing tag: " + r.pop().n);
+			return a;
+		}
+		function p(e, t) {
+			for (var n = 0, r = t.length; n < r; n++) if (t[n].o == e.n) return e.tag = "#", !0;
+		}
+		function m(e, t, n) {
+			for (var r = 0, i = n.length; r < i; r++) if (n[r].c == e && n[r].o == t) return !0;
+		}
+		function h(e) {
+			var t = [];
+			for (var n in e) t.push("\"" + v(n) + "\": function(c,p,t,i) {" + e[n] + "}");
+			return "{ " + t.join(",") + " }";
+		}
+		function g(e) {
+			var t = [];
+			for (var n in e.partials) t.push("\"" + v(n) + "\":{name:\"" + v(e.partials[n].name) + "\", " + g(e.partials[n]) + "}");
+			return "partials: {" + t.join(",") + "}, subs: " + h(e.subs);
+		}
+		e.stringify = function(t, n, r) {
+			return "{code: function (c,p,i) { " + e.wrapMain(t.code) + " }," + g(t) + "}";
+		};
+		var _ = 0;
+		e.generate = function(t, n, r) {
+			_ = 0;
+			var i = {
+				code: "",
+				subs: {},
+				partials: {}
+			};
+			return e.walk(t, i), r.asString ? this.stringify(i, n, r) : this.makeTemplate(i, n, r);
+		}, e.wrapMain = function(e) {
+			return "var t=this;t.b(i=i||\"\");" + e + "return t.fl();";
+		}, e.template = e.Template, e.makeTemplate = function(e, t, n) {
+			var r = this.makePartials(e);
+			return r.code = Function("c", "p", "i", this.wrapMain(e.code)), new this.template(r, t, this, n);
+		}, e.makePartials = function(e) {
+			var t, n = {
+				subs: {},
+				partials: e.partials,
+				name: e.name
+			};
+			for (t in n.partials) n.partials[t] = this.makePartials(n.partials[t]);
+			for (t in e.subs) n.subs[t] = Function("c", "p", "t", "i", e.subs[t]);
+			return n;
+		};
+		function v(e) {
+			return e.replace(a, "\\\\").replace(n, "\\\"").replace(r, "\\n").replace(i, "\\r").replace(o, "\\u2028").replace(s, "\\u2029");
+		}
+		function y(e) {
+			return ~e.indexOf(".") ? "d" : "f";
+		}
+		function b(e, t) {
+			var n = "<" + (t.prefix || "") + e.n + _++;
+			return t.partials[n] = {
+				name: e.n,
+				partials: {}
+			}, t.code += "t.b(t.rp(\"" + v(n) + "\",c,p,\"" + (e.indent || "") + "\"));", n;
+		}
+		e.codegen = {
+			"#": function(t, n) {
+				n.code += "if(t.s(t." + y(t.n) + "(\"" + v(t.n) + "\",c,p,1),c,p,0," + t.i + "," + t.end + ",\"" + t.otag + " " + t.ctag + "\")){t.rs(c,p,function(c,p,t){", e.walk(t.nodes, n), n.code += "});c.pop();}";
+			},
+			"^": function(t, n) {
+				n.code += "if(!t.s(t." + y(t.n) + "(\"" + v(t.n) + "\",c,p,1),c,p,1,0,0,\"\")){", e.walk(t.nodes, n), n.code += "};";
+			},
+			">": b,
+			"<": function(t, n) {
+				var r = {
+					partials: {},
+					code: "",
+					subs: {},
+					inPartial: !0
+				};
+				e.walk(t.nodes, r);
+				var i = n.partials[b(t, n)];
+				i.subs = r.subs, i.partials = r.partials;
+			},
+			$: function(t, n) {
+				var r = {
+					subs: {},
+					code: "",
+					partials: n.partials,
+					prefix: t.n
+				};
+				e.walk(t.nodes, r), n.subs[t.n] = r.code, n.inPartial || (n.code += "t.sub(\"" + v(t.n) + "\",c,p,i);");
+			},
+			"\n": function(e, t) {
+				t.code += S("\"\\n\"" + (e.last ? "" : " + i"));
+			},
+			_v: function(e, t) {
+				t.code += "t.b(t.v(t." + y(e.n) + "(\"" + v(e.n) + "\",c,p,0)));";
+			},
+			_t: function(e, t) {
+				t.code += S("\"" + v(e.text) + "\"");
+			},
+			"{": x,
+			"&": x
+		};
+		function x(e, t) {
+			t.code += "t.b(t.t(t." + y(e.n) + "(\"" + v(e.n) + "\",c,p,0)));";
+		}
+		function S(e) {
+			return "t.b(" + e + ");";
+		}
+		e.walk = function(t, n) {
+			for (var r, i = 0, a = t.length; i < a; i++) r = e.codegen[t[i].tag], r && r(t[i], n);
+			return n;
+		}, e.parse = function(e, t, n) {
+			return n ||= {}, f(e, "", [], n.sectionTags || []);
+		}, e.cache = {}, e.cacheKey = function(e, t) {
+			return [
+				e,
+				!!t.asString,
+				!!t.disableLambda,
+				t.delimiters,
+				!!t.modelGet
+			].join("||");
+		}, e.compile = function(t, n) {
+			n ||= {};
+			var r = e.cacheKey(t, n), i = this.cache[r];
+			if (i) {
+				var a = i.partials;
+				for (var o in a) delete a[o].instance;
+				return i;
+			}
+			return i = this.generate(this.parse(this.scan(t, n.delimiters), t, n), t, n), this.cache[r] = i;
+		};
+	})(e === void 0 ? Hogan : e);
+})), Me = /* @__PURE__ */ o(((e) => {
+	(function(e) {
+		e.Template = function(e, t, n, r) {
+			e ||= {}, this.r = e.code || this.r, this.c = n, this.options = r || {}, this.text = t || "", this.partials = e.partials || {}, this.subs = e.subs || {}, this.buf = "";
+		}, e.Template.prototype = {
+			r: function(e, t, n) {
+				return "";
+			},
+			v: u,
+			t: l,
+			render: function(e, t, n) {
+				return this.ri([e], t || {}, n);
+			},
+			ri: function(e, t, n) {
+				return this.r(e, t, n);
+			},
+			ep: function(e, t) {
+				var r = this.partials[e], i = t[r.name];
+				if (r.instance && r.base == i) return r.instance;
+				if (typeof i == "string") {
+					if (!this.c) throw Error("No compiler available.");
+					i = this.c.compile(i, this.options);
+				}
+				if (!i) return null;
+				if (this.partials[e].base = i, r.subs) {
+					for (key in t.stackText ||= {}, r.subs) t.stackText[key] || (t.stackText[key] = this.activeSub !== void 0 && t.stackText[this.activeSub] ? t.stackText[this.activeSub] : this.text);
+					i = n(i, r.subs, r.partials, this.stackSubs, this.stackPartials, t.stackText);
+				}
+				return this.partials[e].instance = i, i;
+			},
+			rp: function(e, t, n, r) {
+				var i = this.ep(e, n);
+				return i ? i.ri(t, n, r) : "";
+			},
+			rs: function(e, t, n) {
+				var r = e[e.length - 1];
+				if (!d(r)) {
+					n(e, t, this);
+					return;
+				}
+				for (var i = 0; i < r.length; i++) e.push(r[i]), n(e, t, this), e.pop();
+			},
+			s: function(e, t, n, r, i, a, o) {
+				var s;
+				return d(e) && e.length === 0 ? !1 : (typeof e == "function" && (e = this.ms(e, t, n, r, i, a, o)), s = !!e, !r && s && t && t.push(typeof e == "object" ? e : t[t.length - 1]), s);
+			},
+			d: function(e, n, r, i) {
+				var a, o = e.split("."), s = this.f(o[0], n, r, i), c = this.options.modelGet, l = null;
+				if (e === "." && d(n[n.length - 2])) s = n[n.length - 1];
+				else for (var u = 1; u < o.length; u++) a = t(o[u], s, c), a === void 0 ? s = "" : (l = s, s = a);
+				return i && !s ? !1 : (!i && typeof s == "function" && (n.push(l), s = this.mv(s, n, r), n.pop()), s);
+			},
+			f: function(e, n, r, i) {
+				for (var a = !1, o = null, s = !1, c = this.options.modelGet, l = n.length - 1; l >= 0; l--) if (o = n[l], a = t(e, o, c), a !== void 0) {
+					s = !0;
+					break;
+				}
+				return s ? (!i && typeof a == "function" && (a = this.mv(a, n, r)), a) : i ? !1 : "";
+			},
+			ls: function(e, t, n, r, i, a) {
+				var o = this.options.delimiters;
+				return this.options.delimiters = a, this.b(this.ct(l(e.call(t, i, n)), t, r)), this.options.delimiters = o, !1;
+			},
+			ct: function(e, t, n) {
+				if (this.options.disableLambda) throw Error("Lambda features disabled.");
+				return this.c.compile(e, this.options).render(t, n);
+			},
+			b: function(e) {
+				this.buf += e;
+			},
+			fl: function() {
+				var e = this.buf;
+				return this.buf = "", e;
+			},
+			ms: function(e, t, n, r, i, a, o) {
+				var s, c = t[t.length - 1], l = e.call(c);
+				return typeof l == "function" ? r ? !0 : (s = this.activeSub && this.subsText && this.subsText[this.activeSub] ? this.subsText[this.activeSub] : this.text, this.ls(l, c, t, n, s.substring(i, a), o)) : l;
+			},
+			mv: function(e, t, n) {
+				var r = t[t.length - 1], i = e.call(r);
+				return typeof i == "function" ? this.ct(l(i.call(r)), r, n) : i;
+			},
+			sub: function(e, t, n, r) {
+				var i = this.subs[e];
+				i && (this.activeSub = e, i(t, n, this, r), this.activeSub = !1);
+			}
+		};
+		function t(e, t, n) {
+			var r;
+			return t && typeof t == "object" && (t[e] === void 0 ? n && t.get && typeof t.get == "function" && (r = t.get(e)) : r = t[e]), r;
+		}
+		function n(e, t, n, r, i, a) {
+			function o() {}
+			o.prototype = e;
+			function s() {}
+			s.prototype = e.subs;
+			var c, l = new o();
+			for (c in l.subs = new s(), l.subsText = {}, l.buf = "", r ||= {}, l.stackSubs = r, l.subsText = a, t) r[c] || (r[c] = t[c]);
+			for (c in r) l.subs[c] = r[c];
+			for (c in i ||= {}, l.stackPartials = i, n) i[c] || (i[c] = n[c]);
+			for (c in i) l.partials[c] = i[c];
+			return l;
+		}
+		var r = /&/g, i = /</g, a = />/g, o = /\'/g, s = /\"/g, c = /[&<>\"\']/;
+		function l(e) {
+			return String(e ?? "");
+		}
+		function u(e) {
+			return e = l(e), c.test(e) ? e.replace(r, "&amp;").replace(i, "&lt;").replace(a, "&gt;").replace(o, "&#39;").replace(s, "&quot;") : e;
+		}
+		var d = Array.isArray || function(e) {
+			return Object.prototype.toString.call(e) === "[object Array]";
+		};
+	})(e === void 0 ? {} : e);
+})), Q = /* @__PURE__ */ c((/* @__PURE__ */ o(((e, t) => {
+	var n = je();
+	n.Template = Me().Template, n.template = n.Template, t.exports = n;
+})))()), $ = {};
+$["file-summary-line"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<li class=\"d2h-file-list-line\">"), r.b("\n" + n), r.b("    <span class=\"d2h-file-name-wrapper\">"), r.b("\n" + n), r.b(r.rp("<fileIcon0", e, t, "      ")), r.b("      <a href=\"#"), r.b(r.v(r.f("fileHtmlId", e, t, 0))), r.b("\" class=\"d2h-file-name\">"), r.b(r.v(r.f("fileName", e, t, 0))), r.b("</a>"), r.b("\n" + n), r.b("      <span class=\"d2h-file-stats\">"), r.b("\n" + n), r.b("          <span class=\"d2h-lines-added\">"), r.b(r.v(r.f("addedLines", e, t, 0))), r.b("</span>"), r.b("\n" + n), r.b("          <span class=\"d2h-lines-deleted\">"), r.b(r.v(r.f("deletedLines", e, t, 0))), r.b("</span>"), r.b("\n" + n), r.b("      </span>"), r.b("\n" + n), r.b("    </span>"), r.b("\n" + n), r.b("</li>"), r.fl();
+	},
+	partials: { "<fileIcon0": {
+		name: "fileIcon",
+		partials: {},
+		subs: {}
+	} },
+	subs: {}
+}), $["file-summary-wrapper"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<div class=\"d2h-file-list-wrapper "), r.b(r.v(r.f("colorScheme", e, t, 0))), r.b("\">"), r.b("\n" + n), r.b("    <div class=\"d2h-file-list-header\">"), r.b("\n" + n), r.b("        <span class=\"d2h-file-list-title\">Files changed ("), r.b(r.v(r.f("filesNumber", e, t, 0))), r.b(")</span>"), r.b("\n" + n), r.b("        <a class=\"d2h-file-switch d2h-hide\">hide</a>"), r.b("\n" + n), r.b("        <a class=\"d2h-file-switch d2h-show\">show</a>"), r.b("\n" + n), r.b("    </div>"), r.b("\n" + n), r.b("    <ol class=\"d2h-file-list\">"), r.b("\n" + n), r.b("    "), r.b(r.t(r.f("files", e, t, 0))), r.b("\n" + n), r.b("    </ol>"), r.b("\n" + n), r.b("</div>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+}), $["generic-block-header"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<tr>"), r.b("\n" + n), r.b("    <td class=\""), r.b(r.v(r.f("lineClass", e, t, 0))), r.b(" "), r.b(r.v(r.d("CSSLineClass.INFO", e, t, 0))), r.b("\"></td>"), r.b("\n" + n), r.b("    <td class=\""), r.b(r.v(r.d("CSSLineClass.INFO", e, t, 0))), r.b("\">"), r.b("\n" + n), r.b("        <div class=\""), r.b(r.v(r.f("contentClass", e, t, 0))), r.b("\">"), r.s(r.f("blockHeader", e, t, 1), e, t, 0, 156, 173, "{{ }}") && (r.rs(e, t, function(e, t, n) {
+			n.b(n.t(n.f("blockHeader", e, t, 0)));
+		}), e.pop()), r.s(r.f("blockHeader", e, t, 1), e, t, 1, 0, 0, "") || r.b("&nbsp;"), r.b("</div>"), r.b("\n" + n), r.b("    </td>"), r.b("\n" + n), r.b("</tr>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+}), $["generic-empty-diff"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<tr>"), r.b("\n" + n), r.b("    <td class=\""), r.b(r.v(r.d("CSSLineClass.INFO", e, t, 0))), r.b("\">"), r.b("\n" + n), r.b("        <div class=\""), r.b(r.v(r.f("contentClass", e, t, 0))), r.b("\">"), r.b("\n" + n), r.b("            File without changes"), r.b("\n" + n), r.b("        </div>"), r.b("\n" + n), r.b("    </td>"), r.b("\n" + n), r.b("</tr>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+}), $["generic-file-path"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<span class=\"d2h-file-name-wrapper\">"), r.b("\n" + n), r.b(r.rp("<fileIcon0", e, t, "    ")), r.b("    <span class=\"d2h-file-name\">"), r.b(r.v(r.f("fileDiffName", e, t, 0))), r.b("</span>"), r.b("\n" + n), r.b(r.rp("<fileTag1", e, t, "    ")), r.b("</span>"), r.b("\n" + n), r.b("<label class=\"d2h-file-collapse\">"), r.b("\n" + n), r.b("    <input class=\"d2h-file-collapse-input\" type=\"checkbox\" name=\"viewed\" value=\"viewed\">"), r.b("\n" + n), r.b("    Viewed"), r.b("\n" + n), r.b("</label>"), r.fl();
+	},
+	partials: {
+		"<fileIcon0": {
+			name: "fileIcon",
+			partials: {},
+			subs: {}
+		},
+		"<fileTag1": {
+			name: "fileTag",
+			partials: {},
+			subs: {}
+		}
+	},
+	subs: {}
+}), $["generic-line"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<tr>"), r.b("\n" + n), r.b("    <td class=\""), r.b(r.v(r.f("lineClass", e, t, 0))), r.b(" "), r.b(r.v(r.f("type", e, t, 0))), r.b("\">"), r.b("\n" + n), r.b("      "), r.b(r.t(r.f("lineNumber", e, t, 0))), r.b("\n" + n), r.b("    </td>"), r.b("\n" + n), r.b("    <td class=\""), r.b(r.v(r.f("type", e, t, 0))), r.b("\">"), r.b("\n" + n), r.b("        <div class=\""), r.b(r.v(r.f("contentClass", e, t, 0))), r.b("\">"), r.b("\n" + n), r.s(r.f("prefix", e, t, 1), e, t, 0, 162, 238, "{{ }}") && (r.rs(e, t, function(e, t, r) {
+			r.b("            <span class=\"d2h-code-line-prefix\">"), r.b(r.t(r.f("prefix", e, t, 0))), r.b("</span>"), r.b("\n" + n);
+		}), e.pop()), r.s(r.f("prefix", e, t, 1), e, t, 1, 0, 0, "") || (r.b("            <span class=\"d2h-code-line-prefix\">&nbsp;</span>"), r.b("\n" + n)), r.s(r.f("content", e, t, 1), e, t, 0, 371, 445, "{{ }}") && (r.rs(e, t, function(e, t, r) {
+			r.b("            <span class=\"d2h-code-line-ctn\">"), r.b(r.t(r.f("content", e, t, 0))), r.b("</span>"), r.b("\n" + n);
+		}), e.pop()), r.s(r.f("content", e, t, 1), e, t, 1, 0, 0, "") || (r.b("            <span class=\"d2h-code-line-ctn\"><br></span>"), r.b("\n" + n)), r.b("        </div>"), r.b("\n" + n), r.b("    </td>"), r.b("\n" + n), r.b("</tr>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+}), $["generic-wrapper"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<div class=\"d2h-wrapper "), r.b(r.v(r.f("colorScheme", e, t, 0))), r.b("\">"), r.b("\n" + n), r.b("    "), r.b(r.t(r.f("content", e, t, 0))), r.b("\n" + n), r.b("</div>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+}), $["icon-file-added"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<svg aria-hidden=\"true\" class=\"d2h-icon d2h-added\" height=\"16\" title=\"added\" version=\"1.1\" viewBox=\"0 0 14 16\""), r.b("\n" + n), r.b("     width=\"14\">"), r.b("\n" + n), r.b("    <path d=\"M13 1H1C0.45 1 0 1.45 0 2v12c0 0.55 0.45 1 1 1h12c0.55 0 1-0.45 1-1V2c0-0.55-0.45-1-1-1z m0 13H1V2h12v12zM6 9H3V7h3V4h2v3h3v2H8v3H6V9z\"></path>"), r.b("\n" + n), r.b("</svg>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+}), $["icon-file-changed"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<svg aria-hidden=\"true\" class=\"d2h-icon d2h-changed\" height=\"16\" title=\"modified\" version=\"1.1\""), r.b("\n" + n), r.b("     viewBox=\"0 0 14 16\" width=\"14\">"), r.b("\n" + n), r.b("    <path d=\"M13 1H1C0.45 1 0 1.45 0 2v12c0 0.55 0.45 1 1 1h12c0.55 0 1-0.45 1-1V2c0-0.55-0.45-1-1-1z m0 13H1V2h12v12zM4 8c0-1.66 1.34-3 3-3s3 1.34 3 3-1.34 3-3 3-3-1.34-3-3z\"></path>"), r.b("\n" + n), r.b("</svg>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+}), $["icon-file-deleted"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<svg aria-hidden=\"true\" class=\"d2h-icon d2h-deleted\" height=\"16\" title=\"removed\" version=\"1.1\""), r.b("\n" + n), r.b("     viewBox=\"0 0 14 16\" width=\"14\">"), r.b("\n" + n), r.b("    <path d=\"M13 1H1C0.45 1 0 1.45 0 2v12c0 0.55 0.45 1 1 1h12c0.55 0 1-0.45 1-1V2c0-0.55-0.45-1-1-1z m0 13H1V2h12v12zM11 9H3V7h8v2z\"></path>"), r.b("\n" + n), r.b("</svg>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+}), $["icon-file-renamed"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<svg aria-hidden=\"true\" class=\"d2h-icon d2h-moved\" height=\"16\" title=\"renamed\" version=\"1.1\""), r.b("\n" + n), r.b("     viewBox=\"0 0 14 16\" width=\"14\">"), r.b("\n" + n), r.b("    <path d=\"M6 9H3V7h3V4l5 4-5 4V9z m8-7v12c0 0.55-0.45 1-1 1H1c-0.55 0-1-0.45-1-1V2c0-0.55 0.45-1 1-1h12c0.55 0 1 0.45 1 1z m-1 0H1v12h12V2z\"></path>"), r.b("\n" + n), r.b("</svg>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+}), $["icon-file"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<svg aria-hidden=\"true\" class=\"d2h-icon\" height=\"16\" version=\"1.1\" viewBox=\"0 0 12 16\" width=\"12\">"), r.b("\n" + n), r.b("    <path d=\"M6 5H2v-1h4v1zM2 8h7v-1H2v1z m0 2h7v-1H2v1z m0 2h7v-1H2v1z m10-7.5v9.5c0 0.55-0.45 1-1 1H1c-0.55 0-1-0.45-1-1V2c0-0.55 0.45-1 1-1h7.5l3.5 3.5z m-1 0.5L8 2H1v12h10V5z\"></path>"), r.b("\n" + n), r.b("</svg>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+}), $["line-by-line-file-diff"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<div id=\""), r.b(r.v(r.f("fileHtmlId", e, t, 0))), r.b("\" class=\"d2h-file-wrapper\" data-lang=\""), r.b(r.v(r.d("file.language", e, t, 0))), r.b("\">"), r.b("\n" + n), r.b("    <div class=\"d2h-file-header\">"), r.b("\n" + n), r.b("    "), r.b(r.t(r.f("filePath", e, t, 0))), r.b("\n" + n), r.b("    </div>"), r.b("\n" + n), r.b("    <div class=\"d2h-file-diff\">"), r.b("\n" + n), r.b("        <div class=\"d2h-code-wrapper\">"), r.b("\n" + n), r.b("            <table class=\"d2h-diff-table\">"), r.b("\n" + n), r.b("                <tbody class=\"d2h-diff-tbody\">"), r.b("\n" + n), r.b("                "), r.b(r.t(r.f("diffs", e, t, 0))), r.b("\n" + n), r.b("                </tbody>"), r.b("\n" + n), r.b("            </table>"), r.b("\n" + n), r.b("        </div>"), r.b("\n" + n), r.b("    </div>"), r.b("\n" + n), r.b("</div>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+}), $["line-by-line-numbers"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<div class=\"line-num1\">"), r.b(r.v(r.f("oldNumber", e, t, 0))), r.b("</div>"), r.b("\n" + n), r.b("<div class=\"line-num2\">"), r.b(r.v(r.f("newNumber", e, t, 0))), r.b("</div>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+}), $["side-by-side-file-diff"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<div id=\""), r.b(r.v(r.f("fileHtmlId", e, t, 0))), r.b("\" class=\"d2h-file-wrapper\" data-lang=\""), r.b(r.v(r.d("file.language", e, t, 0))), r.b("\">"), r.b("\n" + n), r.b("    <div class=\"d2h-file-header\">"), r.b("\n" + n), r.b("      "), r.b(r.t(r.f("filePath", e, t, 0))), r.b("\n" + n), r.b("    </div>"), r.b("\n" + n), r.b("    <div class=\"d2h-files-diff\">"), r.b("\n" + n), r.b("        <div class=\"d2h-file-side-diff\">"), r.b("\n" + n), r.b("            <div class=\"d2h-code-wrapper\">"), r.b("\n" + n), r.b("                <table class=\"d2h-diff-table\">"), r.b("\n" + n), r.b("                    <tbody class=\"d2h-diff-tbody\">"), r.b("\n" + n), r.b("                    "), r.b(r.t(r.d("diffs.left", e, t, 0))), r.b("\n" + n), r.b("                    </tbody>"), r.b("\n" + n), r.b("                </table>"), r.b("\n" + n), r.b("            </div>"), r.b("\n" + n), r.b("        </div>"), r.b("\n" + n), r.b("        <div class=\"d2h-file-side-diff\">"), r.b("\n" + n), r.b("            <div class=\"d2h-code-wrapper\">"), r.b("\n" + n), r.b("                <table class=\"d2h-diff-table\">"), r.b("\n" + n), r.b("                    <tbody class=\"d2h-diff-tbody\">"), r.b("\n" + n), r.b("                    "), r.b(r.t(r.d("diffs.right", e, t, 0))), r.b("\n" + n), r.b("                    </tbody>"), r.b("\n" + n), r.b("                </table>"), r.b("\n" + n), r.b("            </div>"), r.b("\n" + n), r.b("        </div>"), r.b("\n" + n), r.b("    </div>"), r.b("\n" + n), r.b("</div>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+}), $["tag-file-added"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<span class=\"d2h-tag d2h-added d2h-added-tag\">ADDED</span>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+}), $["tag-file-changed"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<span class=\"d2h-tag d2h-changed d2h-changed-tag\">CHANGED</span>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+}), $["tag-file-deleted"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<span class=\"d2h-tag d2h-deleted d2h-deleted-tag\">DELETED</span>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+}), $["tag-file-renamed"] = new Q.Template({
+	code: function(e, t, n) {
+		var r = this;
+		return r.b(n ||= ""), r.b("<span class=\"d2h-tag d2h-moved d2h-moved-tag\">RENAMED</span>"), r.fl();
+	},
+	partials: {},
+	subs: {}
+});
+//#endregion
+//#region node_modules/diff2html/lib-esm/hoganjs-utils.js
+var Ne = class {
+	constructor({ compiledTemplates: e = {}, rawTemplates: t = {} }) {
+		let n = Object.entries(t).reduce((e, [t, n]) => {
+			let r = Q.compile(n, { asString: !1 });
+			return Object.assign(Object.assign({}, e), { [t]: r });
+		}, {});
+		this.preCompiledTemplates = Object.assign(Object.assign(Object.assign({}, $), e), n);
+	}
+	static compile(e) {
+		return Q.compile(e, { asString: !1 });
+	}
+	render(e, t, n, r, i) {
+		let a = this.templateKey(e, t);
+		try {
+			return this.preCompiledTemplates[a].render(n, r, i);
+		} catch {
+			throw Error(`Could not find template to render '${a}'`);
+		}
+	}
+	template(e, t) {
+		return this.preCompiledTemplates[this.templateKey(e, t)];
+	}
+	templateKey(e, t) {
+		return `${e}-${t}`;
+	}
+}, Pe = Object.assign(Object.assign(Object.assign({}, xe), Ee), {
+	outputFormat: u.LINE_BY_LINE,
+	drawFileList: !0
+});
+function Fe(e, t = {}) {
+	let n = Object.assign(Object.assign({}, Pe), t), r = typeof e == "string" ? te(e, n) : e, i = new Ne(n), { colorScheme: a } = n, o = { colorScheme: a };
+	return (n.drawFileList ? new be(i, o).render(r) : "") + (n.outputFormat === "side-by-side" ? new Ae(i, n).render(r) : new Te(i, n).render(r));
+}
+//#endregion
+//#region resources/js/index.js
+function Ie({ diff: e, options: t, colorScheme: n }) {
+	return {
+		observer: null,
+		renderedColorScheme: null,
+		init() {
+			this.render(), n === "filament" && (this.observer = new MutationObserver(() => {
+				this.resolveColorScheme() !== this.renderedColorScheme && this.render();
+			}), this.observer.observe(document.documentElement, {
+				attributes: !0,
+				attributeFilter: ["class"]
+			}));
+		},
+		destroy() {
+			this.observer?.disconnect(), this.observer = null;
+		},
+		resolveColorScheme() {
+			return n === "filament" ? document.documentElement.classList.contains("dark") ? "dark" : "light" : n;
+		},
+		render() {
+			let n = this.$refs.container;
+			if (n) {
+				if (!e) {
+					n.innerHTML = "";
+					return;
+				}
+				this.renderedColorScheme = this.resolveColorScheme(), n.innerHTML = Fe(e, {
+					...t,
+					colorScheme: this.renderedColorScheme
+				});
+			}
+		}
+	};
+}
+//#endregion
+export { Ie as default };

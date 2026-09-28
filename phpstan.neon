@@ -6,7 +6,4 @@ parameters:
     paths:
         - src
         - config
-        - database
-    # Filament specific
-    # ignoreErrors:
-    #     - '#Unsafe usage of new static#'
+        - tests
