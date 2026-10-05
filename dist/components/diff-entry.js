@@ -1,14 +1,14 @@
 //#region \0rolldown/runtime.js
-var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescriptor, r = Object.getOwnPropertyNames, i = Object.getPrototypeOf, a = Object.prototype.hasOwnProperty, o = (e, t) => () => (t || e((t = { exports: {} }).exports, t), t.exports), s = (e, i, o, s) => {
+var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescriptor, r = Object.getOwnPropertyNames, i = Object.getPrototypeOf, a = Object.prototype.hasOwnProperty, o = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), e = null), t.exports), s = (e, i, o, s) => {
 	if (i && typeof i == "object" || typeof i == "function") for (var c = r(i), l = 0, u = c.length, d; l < u; l++) d = c[l], !a.call(e, d) && d !== o && t(e, d, {
 		get: ((e) => i[e]).bind(null, d),
 		enumerable: !(s = n(i, d)) || s.enumerable
 	});
 	return e;
-}, c = (n, r, a) => (a = n == null ? {} : e(i(n)), s(r || !n || !n.__esModule ? t(a, "default", {
+}, c = (n, r, o) => (o = n == null ? {} : e(i(n)), s(r || !n || !n.__esModule || !a.call(n, "default") ? t(o, "default", {
 	value: n,
 	enumerable: !0
-}) : a, n)), l;
+}) : o, n)), l;
 (function(e) {
 	e.INSERT = "insert", e.DELETE = "delete", e.CONTEXT = "context";
 })(l ||= {});
@@ -80,7 +80,7 @@ var x = [
 	"o/"
 ];
 function S(e, t, n) {
-	let r = n === void 0 ? x : [...x, n], [, i = ""] = (t ? RegExp(`^${h(t)} "?(.+?)"?$`) : /* @__PURE__ */ RegExp("^\"?(.+?)\"?$")).exec(e) || [], a = r.find((e) => i.indexOf(e) === 0);
+	let r = n === void 0 ? x : [...x, n], [, i = ""] = RegExp(t ? `^${h(t)} "?(.+?)"?$` : "^\"?(.+?)\"?$").exec(e) || [], a = r.find((e) => i.indexOf(e) === 0);
 	return (a ? i.slice(a.length) : i).replace(/\s+\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:\.\d+)? [+-]\d{4}.*$/, "");
 }
 function C(e, t) {
@@ -194,7 +194,8 @@ var w = class {
 					r(e);
 				}, 0);
 				return;
-			} else return e;
+			}
+			return e;
 		}, a = t.length, o = e.length, s = 1, c = a + o;
 		n.maxEditLength != null && (c = Math.min(c, n.maxEditLength));
 		let l = n.timeout ?? Infinity, u = Date.now() + l, d = [{
@@ -318,8 +319,8 @@ function re(e, t, n) {
 //#endregion
 //#region node_modules/diff/libesm/util/string.js
 function T(e, t) {
-	let n;
-	for (n = 0; n < e.length && n < t.length; n++) if (e[n] != t[n]) return e.slice(0, n);
+	let n = 0;
+	for (; n < e.length && n < t.length; n++) if (e[n] != t[n]) return e.slice(0, n);
 	return e.slice(0, n);
 }
 function E(e, t) {
@@ -508,8 +509,8 @@ new class extends w {
 }();
 function I(e, t, n, r, i) {
 	t ||= [], n ||= [], r && (e = r(i === void 0 ? "" : i, e));
-	let a;
-	for (a = 0; a < t.length; a += 1) if (t[a] === e) return n[a];
+	let a = 0;
+	for (; a < t.length; a += 1) if (t[a] === e) return n[a];
 	let o;
 	if (Object.prototype.toString.call(e) === "[object Array]") {
 		for (t.push(e), o = Array(e.length), n.push(o), a = 0; a < e.length; a += 1) o[a] = I(e[a], t, n, r, String(a));
@@ -542,10 +543,10 @@ new class extends w {
 function ue(e, t) {
 	if (e.length === 0) return t.length;
 	if (t.length === 0) return e.length;
-	let n = [], r;
-	for (r = 0; r <= t.length; r++) n[r] = [r];
-	let i;
-	for (i = 0; i <= e.length; i++) n[0][i] = i;
+	let n = [], r = 0;
+	for (; r <= t.length; r++) n[r] = [r];
+	let i = 0;
+	for (; i <= e.length; i++) n[0][i] = i;
 	for (r = 1; r <= t.length; r++) for (i = 1; i <= e.length; i++) t.charAt(r - 1) === e.charAt(i - 1) ? n[r][i] = n[r - 1][i - 1] : n[r][i] = Math.min(n[r - 1][i - 1] + 1, Math.min(n[r][i - 1] + 1, n[r - 1][i] + 1));
 	return n[t.length][e.length];
 }
@@ -636,9 +637,9 @@ function q(e) {
 		for (; c < l && c < u && i[c] === a[c];) e.push(a[c]), c += 1;
 		for (; l > c && u > c && i[l] === a[u];) r.unshift(a[u]), --l, --u;
 		let d = e.join(V), f = r.join(V), p = i.slice(c, l + 1).join(V), m = a.slice(c, u + 1).join(V);
-		return d.length && f.length ? d + V + "{" + p + " → " + m + "}/" + f : d.length ? d + V + "{" + p + " → " + m + "}" : f.length ? "{" + p + " → " + m + "}/" + f : t + " → " + n;
-	} else if (H(n)) return t;
-	else return n;
+		return d.length && f.length ? d + "/{" + p + " → " + m + "}/" + f : d.length ? d + "/{" + p + " → " + m + "}" : f.length ? "{" + p + " → " + m + "}/" + f : t + " → " + n;
+	}
+	return H(n) ? t : n;
 }
 function J(e) {
 	return `d2h-${_(q(e)).toString().slice(-6)}`;
@@ -1258,7 +1259,7 @@ var _e = "file-summary", ve = "icon", ye = { colorScheme: B.colorScheme }, be = 
 					s = !0;
 					break;
 				}
-				return s ? (!i && typeof a == "function" && (a = this.mv(a, n, r)), a) : i ? !1 : "";
+				return s ? (!i && typeof a == "function" && (a = this.mv(a, n, r)), a) : !i && "";
 			},
 			ls: function(e, t, n, r, i, a) {
 				var o = this.options.delimiters;
