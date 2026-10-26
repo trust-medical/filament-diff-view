@@ -1,5 +1,5 @@
-//#region \0rolldown/runtime.js
-var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescriptor, r = Object.getOwnPropertyNames, i = Object.getPrototypeOf, a = Object.prototype.hasOwnProperty, o = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), e = null), t.exports), s = (e, i, o, s) => {
+// \0rolldown/runtime.js
+var e = Object.create, t = Object.defineProperty, n = Object.getOwnPropertyDescriptor, r = Object.getOwnPropertyNames, i = Object.getPrototypeOf, a = Object.prototype.hasOwnProperty, o = (e, t) => () => (t || (e((t = { exports: {} }).exports, t, t.exports), e = null), t.exports), s = (e, i, o, s) => {
 	if (i && typeof i == "object" || typeof i == "function") for (var c = r(i), l = 0, u = c.length, d; l < u; l++) d = c[l], !a.call(e, d) && d !== o && t(e, d, {
 		get: ((e) => i[e]).bind(null, d),
 		enumerable: !(s = n(i, d)) || s.enumerable
@@ -26,26 +26,8 @@ var u = {
 (function(e) {
 	e.AUTO = "auto", e.DARK = "dark", e.LIGHT = "light";
 })(p ||= {});
-//#endregion
-//#region node_modules/diff2html/lib-esm/utils.js
-var m = RegExp("[" + [
-	"-",
-	"[",
-	"]",
-	"/",
-	"{",
-	"}",
-	"(",
-	")",
-	"*",
-	"+",
-	"?",
-	".",
-	"\\",
-	"^",
-	"$",
-	"|"
-].join("\\") + "]", "g");
+// node_modules/diff2html/lib-esm/utils.js
+var m = RegExp("[-\\[\\]\\/\\{\\}\\(\\)\\*\\+\\?\\.\\\\\\^\\$\\|]", "g");
 function h(e) {
 	return e.replace(m, "\\$&");
 }
@@ -62,8 +44,7 @@ function v(e) {
 	for (let r = 0; r < t; r++) n = Math.max(n, e[r]);
 	return n;
 }
-//#endregion
-//#region node_modules/diff2html/lib-esm/diff-parser.js
+// node_modules/diff2html/lib-esm/diff-parser.js
 function y(e, t) {
 	let n = e.split(".");
 	return n.length > 1 ? n[n.length - 1] : t;
@@ -178,8 +159,7 @@ function te(e, t = {}) {
 		(o = p.exec(e)) ? r.oldMode = o[1] : (o = m.exec(e)) ? r.newMode = o[1] : (o = h.exec(e)) ? (r.deletedFileMode = o[1], r.isDeleted = !0) : (o = g.exec(e)) ? (r.newFileMode = o[1], r.isNew = !0) : (o = _.exec(e)) ? (M && (r.oldName = o[1]), r.isCopy = !0) : (o = v.exec(e)) ? (M && (r.newName = o[1]), r.isCopy = !0) : (o = x.exec(e)) ? (M && (r.oldName = o[1]), r.isRename = !0) : (o = te.exec(e)) ? (M && (r.newName = o[1]), r.isRename = !0) : (o = T.exec(e)) ? (r.isBinary = !0, r.oldName = S(o[1], void 0, t.srcPrefix), r.newName = S(o[2], void 0, t.dstPrefix), F("Binary file")) : E.test(e) ? (r.isBinary = !0, F(e)) : (o = w.exec(e)) ? r.unchangedPercentage = parseInt(o[1], 10) : (o = ne.exec(e)) ? r.changedPercentage = parseInt(o[1], 10) : (o = re.exec(e)) ? (r.checksumBefore = o[1], r.checksumAfter = o[2], o[3] && (r.mode = o[3])) : (o = D.exec(e)) ? (r.checksumBefore = [o[2], o[3]], r.checksumAfter = o[1]) : (o = O.exec(e)) ? (r.oldMode = [o[2], o[3]], r.newMode = o[1]) : (o = k.exec(e)) ? (r.newFileMode = o[1], r.isNew = !0) : (o = A.exec(e)) && (r.deletedFileMode = o[1], r.isDeleted = !0);
 	}), M(), N(), n;
 }
-//#endregion
-//#region node_modules/diff/libesm/diff/base.js
+// node_modules/diff/libesm/diff/base.js
 var w = class {
 	diff(e, t, n = {}) {
 		let r;
@@ -189,13 +169,10 @@ var w = class {
 	}
 	diffWithOptionsObj(e, t, n, r) {
 		let i = (e) => {
-			if (e = this.postProcess(e, n), r) {
-				setTimeout(function() {
-					r(e);
-				}, 0);
-				return;
-			}
-			return e;
+			if (e = this.postProcess(e, n), r) setTimeout(function() {
+				r(e);
+			}, 0);
+			else return e;
 		}, a = t.length, o = e.length, s = 1, c = a + o;
 		n.maxEditLength != null && (c = Math.min(c, n.maxEditLength));
 		let l = n.timeout ?? Infinity, u = Date.now() + l, d = [{
@@ -213,12 +190,11 @@ var w = class {
 					u = l && 0 <= e && e < a;
 				}
 				let h = c && c.oldPos + 1 < o;
-				if (!u && !h) {
-					d[r] = void 0;
-					continue;
+				if (!u && !h) d[r] = void 0;
+				else {
+					if (s = !h || u && c.oldPos < l.oldPos ? this.addToPath(l, !0, !1, 0, n) : this.addToPath(c, !1, !0, 1, n), f = this.extractCommon(s, t, e, r, n), s.oldPos + 1 >= o && f + 1 >= a) return i(this.buildValues(s.lastComponent, t, e)) || !0;
+					d[r] = s, s.oldPos + 1 >= o && (m = Math.min(m, r - 1)), f + 1 >= a && (p = Math.max(p, r + 1));
 				}
-				if (s = !h || u && c.oldPos < l.oldPos ? this.addToPath(l, !0, !1, 0, n) : this.addToPath(c, !1, !0, 1, n), f = this.extractCommon(s, t, e, r, n), s.oldPos + 1 >= o && f + 1 >= a) return i(this.buildValues(s.lastComponent, t, e)) || !0;
-				d[r] = s, s.oldPos + 1 >= o && (m = Math.min(m, r - 1)), f + 1 >= a && (p = Math.max(p, r + 1));
 			}
 			s++;
 		};
@@ -316,8 +292,7 @@ var w = class {
 function re(e, t, n) {
 	return ne.diff(e, t, n);
 }
-//#endregion
-//#region node_modules/diff/libesm/util/string.js
+// node_modules/diff/libesm/util/string.js
 function T(e, t) {
 	let n = 0;
 	for (; n < e.length && n < t.length; n++) if (e[n] != t[n]) return e.slice(0, n);
@@ -374,8 +349,7 @@ function P(e) {
 	let t = e.match(/^\s*/);
 	return t ? t[0] : "";
 }
-//#endregion
-//#region node_modules/diff/libesm/diff/word.js
+// node_modules/diff/libesm/diff/word.js
 var F = "a-zA-Z0-9_\\u{AD}\\u{C0}-\\u{D6}\\u{D8}-\\u{F6}\\u{F8}-\\u{2C6}\\u{2C8}-\\u{2D7}\\u{2DE}-\\u{2FF}\\u{1E00}-\\u{1EFF}", ie = RegExp(`[${F}]+|\\s+|[^${F}]`, "ug");
 new class extends w {
 	equals(e, t, n) {
@@ -455,7 +429,7 @@ new class extends w {
 		super(...arguments), this.tokenize = ce;
 	}
 	equals(e, t, n) {
-		return n.ignoreWhitespace ? ((!n.newlineIsToken || !e.includes("\n")) && (e = e.trim()), (!n.newlineIsToken || !t.includes("\n")) && (t = t.trim())) : n.ignoreNewlineAtEof && !n.newlineIsToken && (e.endsWith("\n") && (e = e.slice(0, -1)), t.endsWith("\n") && (t = t.slice(0, -1))), super.equals(e, t, n);
+		return n.ignoreWhitespace ? (n.newlineIsToken && e.includes("\n") || (e = e.trim()), n.newlineIsToken && t.includes("\n") || (t = t.trim())) : n.ignoreNewlineAtEof && !n.newlineIsToken && (e.endsWith("\n") && (e = e.slice(0, -1)), t.endsWith("\n") && (t = t.slice(0, -1))), super.equals(e, t, n);
 	}
 }();
 function ce(e, t) {
@@ -468,8 +442,7 @@ function ce(e, t) {
 	}
 	return n;
 }
-//#endregion
-//#region node_modules/diff/libesm/diff/sentence.js
+// node_modules/diff/libesm/diff/sentence.js
 function le(e) {
 	return e == "." || e == "!" || e == "?";
 }
@@ -538,8 +511,7 @@ new class extends w {
 		return e;
 	}
 }();
-//#endregion
-//#region node_modules/diff2html/lib-esm/rematch.js
+// node_modules/diff2html/lib-esm/rematch.js
 function ue(e, t) {
 	if (e.length === 0) return t.length;
 	if (t.length === 0) return e.length;
@@ -577,8 +549,7 @@ function R(e) {
 	}
 	return n;
 }
-//#endregion
-//#region node_modules/diff2html/lib-esm/render-utils.js
+// node_modules/diff2html/lib-esm/render-utils.js
 var z = {
 	INSERTS: "d2h-ins",
 	DELETES: "d2h-del",
@@ -682,8 +653,7 @@ function ge(e, t, n, r = {}) {
 		}
 	};
 }
-//#endregion
-//#region node_modules/diff2html/lib-esm/file-list-renderer.js
+// node_modules/diff2html/lib-esm/file-list-renderer.js
 var _e = "file-summary", ve = "icon", ye = { colorScheme: B.colorScheme }, be = class {
 	constructor(e, t = {}) {
 		this.hoganUtils = e, this.config = Object.assign(Object.assign({}, ye), t);
@@ -1238,11 +1208,8 @@ var _e = "file-summary", ve = "icon", ye = { colorScheme: B.colorScheme }, be = 
 			},
 			rs: function(e, t, n) {
 				var r = e[e.length - 1];
-				if (!d(r)) {
-					n(e, t, this);
-					return;
-				}
-				for (var i = 0; i < r.length; i++) e.push(r[i]), n(e, t, this), e.pop();
+				if (!d(r)) n(e, t, this);
+				else for (var i = 0; i < r.length; i++) e.push(r[i]), n(e, t, this), e.pop();
 			},
 			s: function(e, t, n, r, i, a, o) {
 				var s;
@@ -1475,8 +1442,7 @@ $["file-summary-line"] = new Q.Template({
 	partials: {},
 	subs: {}
 });
-//#endregion
-//#region node_modules/diff2html/lib-esm/hoganjs-utils.js
+// node_modules/diff2html/lib-esm/hoganjs-utils.js
 var Ne = class {
 	constructor({ compiledTemplates: e = {}, rawTemplates: t = {} }) {
 		let n = Object.entries(t).reduce((e, [t, n]) => {
@@ -1510,8 +1476,7 @@ function Fe(e, t = {}) {
 	let n = Object.assign(Object.assign({}, Pe), t), r = typeof e == "string" ? te(e, n) : e, i = new Ne(n), { colorScheme: a } = n, o = { colorScheme: a };
 	return (n.drawFileList ? new be(i, o).render(r) : "") + (n.outputFormat === "side-by-side" ? new Ae(i, n).render(r) : new Te(i, n).render(r));
 }
-//#endregion
-//#region resources/js/index.js
+// resources/js/index.js
 function Ie({ diff: e, options: t, colorScheme: n }) {
 	return {
 		observer: null,
@@ -1532,18 +1497,11 @@ function Ie({ diff: e, options: t, colorScheme: n }) {
 		},
 		render() {
 			let n = this.$refs.container;
-			if (n) {
-				if (!e) {
-					n.innerHTML = "";
-					return;
-				}
-				this.renderedColorScheme = this.resolveColorScheme(), n.innerHTML = Fe(e, {
-					...t,
-					colorScheme: this.renderedColorScheme
-				});
-			}
+			n && (e ? (this.renderedColorScheme = this.resolveColorScheme(), n.innerHTML = Fe(e, {
+				...t,
+				colorScheme: this.renderedColorScheme
+			})) : n.innerHTML = "");
 		}
 	};
 }
-//#endregion
 export { Ie as default };
